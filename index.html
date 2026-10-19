@@ -666,7 +666,7 @@ function answer(i){
     const k=knock(3);S.wrong();setTimeout(()=>S.crumble(),60);freeze=.12;shake=.28;flash('#ff4d5e');popAt(settledTop()+FH*2,k?`−${k}`:'Miss','bad')}
   peak=Math.max(peak,tower.length);
   if(!beat&&best>0&&tower.length>best){beat=true;setRecord(best,true);S.record();setTimeout(()=>{banner('New record!',`Past ${best} floors`,'var(--good-d)');burst('conf',new THREE.Vector3(0,BASE_Y+settledTop()+1,0),46)},350)}
-  paintHud();
+  paintHud();toParent({type:'edu-progress',game:'stackfall',score:tower.length,right,asked});
   setTimeout(()=>{if(state==='run')ask()},ok?360:950)}
 ansEls.forEach((b,i)=>b.addEventListener('pointerdown',e=>{e.preventDefault();answer(i)}));
 ansEls.forEach((b,i)=>b.addEventListener('click',e=>{if(e.detail===0)answer(i)}));
@@ -700,14 +700,27 @@ $('pause').onclick=pause;$('resumeBtn').onclick=resume;$('quitBtn').onclick=()=>
 document.addEventListener('visibilitychange',()=>{if(document.hidden)pause()});
 addEventListener('keydown',e=>{if(e.repeat)return;
   if(e.code==='Escape'||e.code==='KeyP'){state==='paused'?resume():pause();return}
-  if(state==='over'&&e.code==='Enter'&&!$('over').hidden){rope.visible=true;start();return}
+  if(state==='over'&&e.code==='Enter'&&!$('over').hidden&&!(EMBED&&EMBED.lock)){rope.visible=true;start();return}
   const n={Digit1:0,Digit2:1,Digit3:2,Numpad1:0,Numpad2:1,Numpad3:2,ArrowLeft:0,ArrowDown:1,ArrowRight:2}[e.code];
   if(n!=null&&state==='run'){e.preventDefault();answer(n)}});
+
+/* ======================= PORTAL EMBED (edugames contract v1) =======================
+   Opened by the portal as ?topic=<id>&level=1-3&time=60|90|120&lock=1 → settings come from the portal and the run starts at once.
+   lock=1 (class mode): no replay, no topic menu. Posts edu-ready on load, edu-progress after every answer, edu-result at the end. */
+const EMBED=(()=>{const p=new URLSearchParams(location.search);if(!p.get('topic'))return null;
+  return{topic:p.get('topic'),level:+p.get('level')||0,time:+p.get('time')||0,lock:p.get('lock')==='1'}})();
+const toParent=m=>{try{if(window.parent!==window)window.parent.postMessage(m,'*')}catch(e){}};
+function applyEmbed(){if(!EMBED)return false;const s=SUBJECTS.find(s=>s.topics.some(t=>t.id===EMBED.topic));if(!s)return false;
+  cfg.subject=s.id;cfg.topic=EMBED.topic;if([1,2,3].includes(EMBED.level))cfg.diffs[EMBED.topic]=EMBED.level;if([60,90,120].includes(EMBED.time))cfg.time=EMBED.time;
+  if(EMBED.lock){$('againBtn').hidden=true;$('menuBtn').hidden=true;const n=document.createElement('p');n.textContent='Result sent to your teacher.';
+    n.style.cssText='margin:0;text-align:center;font-weight:700;opacity:.8';$('againBtn').parentNode.prepend(n)}
+  return true}
 
 /* ======================= LOOP ======================= */
 const clock=new THREE.Clock();let t=0,skyF=0;
 const camPos=new THREE.Vector3(10,6,10),look=new THREE.Vector3(0,2,0),lookTo=new THREE.Vector3(),camTo=new THREE.Vector3();
 paintPalette();reset();go('scrHome');paintAudio();
+if(applyEmbed()){rope.visible=true;start()}toParent({type:'edu-ready',game:'stackfall'});
 function frame(){
   requestAnimationFrame(frame);
   const realDt=Math.min(clock.getDelta(),.25);let dt=Math.min(realDt,.05);
