@@ -87,7 +87,13 @@ const quickSums=()=>{const m=[10,20,50][LV()-1];return Math.random()<.5?(()=>{co
 const twoDigits=()=>{const L=LV(),[A,B]=[[[11,39],[10,29]],[[18,69],[12,29]],[[120,480],[45,299]]][L-1];
   return Math.random()<.5?(()=>{const a=ri_(...A),b=ri_(...B);return num(`${a} + ${b}`,a+b,[-10,10,-1,1])})()
   :(()=>{const b=ri_(...B),a=b+ri_(5,A[1]);return num(`${a} − ${b}`,a-b,[-10,10,-1,1])})()};
-const times=()=>{const m=[5,10,12][LV()-1],a=ri_(2,m),b=ri_(2,m);return num(`${a} × ${b}`,a*b,[-a,a,-b,b,1,-1])};
+// Easy: 2–5. Medium: 2–10, one factor usually 6–9 (no more 2×2 on Medium). Hard: 3–12, one factor 6–12.
+const times=()=>{const L=LV();let a,b;
+  if(L===1){a=ri_(2,5);b=ri_(2,5)}
+  else if(L===2){a=Math.random()<.8?ri_(6,9):ri_(3,10);b=ri_(2,10)}
+  else{a=ri_(6,12);b=ri_(3,12)}
+  if(Math.random()<.5)[a,b]=[b,a];
+  return num(`${a} × ${b}`,a*b,[-a,a,-b,b,1,-1])};
 const division=()=>{const L=LV(),b=ri_(2,[5,10,12][L-1]),c=ri_(2,[10,12,15][L-1]);return num(`${b*c} ÷ ${b}`,c,[-1,1,2,-2])};
 const percent=()=>{const P=[[10,50],[10,20,25,50],[15,25,30,75]][LV()-1],p=P[ri_(0,P.length-1)],n=ri_(2,12)*20;return num(`${p}% of ${n}`,n*p/100,[-10,10,-5,5])};
 const negatives=()=>{const m=[9,15,40][LV()-1],t=Math.random(),a=ri_(2,m),b=ri_(2,m+5);
@@ -227,7 +233,7 @@ const SUBJECTS=[
  {id:'math',name:'Math',g:'+−',blurb:'Mental arithmetic, fast',topics:[
   {id:'sums',name:'Quick sums',bl:'add and subtract up to 20',d:1,gen:quickSums},
   {id:'twodigits',name:'Two digits',bl:'47 + 28, 83 − 36',d:2,gen:twoDigits},
-  {id:'times',name:'Times tables',bl:'2× up to 10×',d:2,gen:times},
+  {id:'times',name:'Times tables',bl:'2× up to 12×',d:2,gen:times},
   {id:'division',name:'Division',bl:'tables in reverse',d:2,gen:division},
   {id:'percent',name:'Percentages',bl:'10%, 25%, 75% of a number',d:3,gen:percent},
   {id:'negatives',name:'Negative numbers',bl:'below zero and back',d:3,gen:negatives},
@@ -264,9 +270,15 @@ const SHUE={english:'#ff7a5c',math:'#f2c46d',geo:'#5fd39a',science:'#6cb8ff',inf
 const DIFFNAME=['','Easy','Medium','Hard'];
 const findTopic=(sid,tid)=>{const s=SUBJECTS.find(x=>x.id===sid)||SUBJECTS[0];return{subject:s,topic:s.topics.find(t=>t.id===tid)||s.topics[0]}};
 /* Build a stream of questions with no repeats inside a sliding window; answers shuffled, wrongs made unique */
-function stream(topic,level){const recent=[];return function next(){LEVEL=level;let Q,k,g=0;
-  do{Q=topic.gen();k=Q.q+'|'+Q.c+'|'+(Q.img||'').length}while(recent.includes(k)&&g++<40);
-  recent.push(k);if(recent.length>12)recent.shift();
+/* a question's identity: same answer + same operands in any order ("3 × 4" = "4 × 3", "2 + 6" = "6 + 2") */
+function qKey(Q){const q=String(Q.q).replace(/\s*=\s*\?\s*$/,'').trim();
+  const m=q.match(/^(-?\d+)\s*([×+])\s*(-?\d+)$/);
+  const body=m?[m[1],m[3]].sort().join(m[2]):q;return body+'|'+Q.c+'|'+(Q.img||'')}
+/* no repeats for the whole run; only once a topic runs dry do repeats come back, and never one of the last 12 */
+function stream(topic,level){const used=new Set(),recent=[];return function next(){LEVEL=level;let Q,k,g=0;
+  do{Q=topic.gen();k=qKey(Q)}while(used.has(k)&&g++<60);
+  if(used.has(k)){g=0;while(recent.includes(k)&&g++<40){Q=topic.gen();k=qKey(Q)}}
+  used.add(k);recent.push(k);if(recent.length>12)recent.shift();
   const c=String(Q.c),seen=new Set([c]);const raw=Q.w.slice(0,2);while(raw.length<2)raw.push(c);
   const w=raw.map(v=>{let x=String(v);while(seen.has(x))x=isNaN(+x)?x+'s':String(+x+1);seen.add(x);return x});
   const ans=shuffle([c,...w]);return{q:Q.q,img:Q.img||null,code:Q.code||null,ans,correct:ans.indexOf(c),answer:c}}}
