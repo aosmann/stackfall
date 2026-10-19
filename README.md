@@ -7,7 +7,7 @@ Educational tower stacker. Pick a subject, topic, difficulty and time limit, the
 - Every 5 right answers in a row: a bonus gold floor (+2 in total)
 - Record: the tower's height when time runs out, kept per topic, difficulty and time limit
 
-Same family as [Lanefall](https://github.com/aosmann/lanefall) under the hood (no build step, works offline, installs to the iPhone home screen), with its own toy-island look: the sky turns from morning to night as the tower climbs, the next floor swings from a crane, answers are colour + shape coded, and height is shown in metres against real landmarks (3 m per floor).
+Same family as [Lanefall](https://github.com/aosmann/lanefall): the same minimal dark-glass interface, type and ember accent, no build step, works offline and installs to the iPhone home screen. The scene is the app icon's world: a dusk sky that deepens to night as the tower climbs, plain warm slabs, and the next floor swinging from a crane. Height is shown in metres against real landmarks (3 m per floor).
 
 ## Files
 - `index.html` — the game (Three.js scene, menus, audio, scoring)
