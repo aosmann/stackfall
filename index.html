@@ -49,46 +49,43 @@ button:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
 #pause i{display:block;width:3px;height:13px;border-radius:2px;background:var(--ink)}
 #mute{font:500 17px/1 var(--display);position:relative}
 #mute[aria-pressed="false"]::after{content:"";position:absolute;left:11px;right:11px;top:50%;height:1.5px;background:var(--ink);transform:rotate(-45deg)}
-#mid{display:grid;justify-items:center;gap:7px;position:relative}
-#meters{display:flex;gap:8px}
-.meter{display:grid;justify-items:center;gap:3px;background:rgba(8,11,16,.82);padding:5px 16px 7px;border-radius:14px;min-width:78px}
-.meter b{font:400 40px/1 var(--display);font-variant-numeric:tabular-nums}
-.meter small{font:400 11px/1 var(--mono);color:var(--dim);transition:color .2s}
+#mid{display:grid;justify-items:center;gap:6px;position:relative;padding-top:2px}
+/* a soft shade under the top of the screen keeps white numbers readable on the pale dusk */
+#hud::before{content:"";position:fixed;left:0;right:0;top:0;height:calc(150px + env(safe-area-inset-top,0px));pointer-events:none;z-index:-1;
+  background:linear-gradient(rgba(6,9,13,.55),rgba(6,9,13,.25) 55%,rgba(6,9,13,0))}
+#clock{display:flex;align-items:baseline;gap:5px;color:#fff;text-shadow:0 2px 14px rgba(0,0,0,.45)}
+#clockN{font:400 64px/.9 var(--display);font-variant-numeric:tabular-nums;min-width:1.2ch;text-align:right;transition:color .3s}
+#clockL{font:400 13px/1 var(--mono);color:rgba(232,238,244,.75);min-width:4ch;transition:color .2s}
 #clockL.good{color:var(--good)} #clockL.bad{color:var(--bad)}
 #clockN.bump{animation:bump .25s ease-out}
-#floorsN.bump{animation:bump .25s ease-out}
-@keyframes bump{50%{transform:scale(1.14)}}
-#clock.low b{color:var(--bad)}
-#clock.low{animation:pulse 1s ease-in-out infinite}
-@keyframes pulse{50%{box-shadow:0 0 0 1.5px rgba(255,107,90,.55)}}
-#timebar{width:174px;height:3px;display:block;overflow:visible}
+@keyframes bump{50%{transform:scale(1.1)}}
+#clock.low #clockN{color:var(--bad);animation:beat 1s ease-in-out infinite}
+@keyframes beat{12%{transform:scale(1.08)}30%{transform:none}}
+#timebar{width:132px;height:3px;display:block;overflow:visible}
 #timebar line{stroke-width:3;stroke-linecap:round}
-#timebar .track{stroke:var(--line)}
-#timebar .fill{stroke:var(--ink);transition:stroke .3s}
-#clock.low ~ #timebar .fill,#timebar.low .fill{stroke:var(--bad)}
-#chips{display:flex;gap:6px;justify-content:center;min-height:24px}
-.chip{font:500 12px/1 var(--mono);padding:6px 10px;border-radius:999px;border:1px solid rgba(255,210,63,.5);
-  background:var(--glass);color:var(--gold);font-variant-numeric:tabular-nums}
-.chip b{font-weight:500}
+#timebar .track{stroke:rgba(232,238,244,.22)}
+#timebar .fill{stroke:#fff;transition:stroke .3s}
+#timebar.low .fill{stroke:var(--bad)}
+#sub{font:400 13px/1.2 var(--mono);color:rgba(232,238,244,.85);text-shadow:0 1px 8px rgba(0,0,0,.5);display:flex;gap:8px;align-items:baseline}
+#floorsN{font:400 20px/1 var(--display);color:#fff;font-variant-numeric:tabular-nums;display:inline-block}
+#floorsN.bump{animation:bump .25s ease-out}
+#streak{color:var(--gold)}
+#streak::before{content:"·";margin-right:8px;color:rgba(232,238,244,.6)}
+#streak b{font-weight:500}
 #streak.bounce{animation:bump .3s ease-out}
 
 /* ---------- Question + answers ---------- */
-#qbox{top:calc(130px + env(safe-area-inset-top,0px));display:grid;justify-items:center;gap:10px;transition:opacity .3s,transform .3s,visibility .3s}
-#qbox.off{transform:translateY(-8px)}
-#qimg{height:64px;width:auto;border-radius:4px;box-shadow:0 8px 28px rgba(0,0,0,.55)}
-#qtext{font:500 clamp(26px,7.4vw,40px)/1.08 var(--display);text-align:center;text-wrap:balance;max-width:min(22ch,100%);background:var(--plate);padding:10px 20px 13px;border-radius:18px;color:#fff;overflow-wrap:anywhere}
-#qtext.code{font:500 clamp(20px,5.8vw,27px)/1.2 var(--mono);max-width:100%}
+#qbox{display:grid;justify-items:center;gap:8px;padding-bottom:4px;transition:opacity .25s,transform .25s,visibility .25s}
+#qbox.off{opacity:0;transform:translateY(6px)}
+#qimg{height:60px;width:auto;border-radius:4px;box-shadow:0 8px 28px rgba(0,0,0,.55)}
+#qtext{font:500 clamp(26px,7vw,36px)/1.1 var(--display);text-align:center;text-wrap:balance;max-width:100%;background:var(--plate);padding:10px 20px 13px;border-radius:16px;color:#fff;overflow-wrap:anywhere}
+#qtext.code{font:500 clamp(20px,5.6vw,26px)/1.2 var(--mono)}
 #qtag{font:400 12px/1 var(--mono);color:var(--soft);background:var(--plate);padding:6px 10px;border-radius:999px}
 #qbox.wrong #qtext{animation:shake .4s}
 @keyframes shake{20%{transform:translateX(-5px)}40%{transform:translateX(5px)}60%{transform:translateX(-3px)}80%{transform:translateX(2px)}}
 #answers{bottom:0;padding-bottom:calc(14px + env(safe-area-inset-bottom,0px));transition:opacity .25s,transform .25s,visibility .25s}
 #answers.off{transform:translateY(10px)}
 .wrap{width:min(100%,460px);margin:0 auto;display:grid;grid-template-columns:minmax(0,1fr);gap:8px}
-#next{justify-self:center;display:flex;align-items:center;gap:9px;background:var(--plate);border-radius:12px;padding:7px 12px;font:400 11px/1.35 var(--mono);color:var(--soft);max-width:100%;min-width:0}
-#next b{font:400 19px/1 var(--display);color:var(--ink);white-space:nowrap;font-variant-numeric:tabular-nums}
-#next span{min-width:0;text-wrap:balance;overflow-wrap:break-word}
-#next i{display:block;width:40px;height:2px;border-radius:1px;background:var(--line2);overflow:hidden;flex:none}
-#next i::after{content:"";display:block;height:100%;width:var(--p,0%);background:var(--gold);transition:width .4s}
 #opts{display:grid;gap:8px}
 .ans{pointer-events:auto;display:grid;place-items:center;min-height:56px;padding:10px 16px;border-radius:14px;border:1px solid rgba(255,255,255,.16);
   background:rgba(8,11,16,.86);color:#fff;text-align:center;font:500 17px/1.25 var(--mono);transition:border-color .15s,background .15s,transform .1s,opacity .15s}
@@ -212,7 +209,7 @@ h1,h2{margin:0;font-weight:500;font-family:var(--display);text-wrap:balance}
 .perfect{font:400 italic 20px/1.3 var(--display);color:var(--good);text-align:center;margin:0}
 .foot{font:400 12px/1.4 var(--mono);color:var(--dim);text-align:center;margin:0}
 .hint{font:400 12px/1.45 var(--mono);color:var(--soft);margin:0;text-align:center}
-@media (prefers-reduced-motion:reduce){#countN.tick,#clock.low{animation:none}*{transition-duration:.01s!important}}
+@media (prefers-reduced-motion:reduce){#countN.tick,#clock.low #clockN{animation:none}*{transition-duration:.01s!important}}
 </style>
 </head>
 <body>
@@ -221,23 +218,19 @@ h1,h2{margin:0;font-weight:500;font-family:var(--display);text-wrap:balance}
 <div id="hud" class="ui off">
   <button type="button" id="pause" class="round push" aria-label="Pause"><i></i><i></i></button>
   <div id="mid">
-    <div id="meters">
-      <div class="meter" id="floors"><b id="floorsN">0</b><small id="floorsL">floors</small></div>
-      <div class="meter" id="clock" role="timer" aria-label="Seconds left"><b id="clockN">15</b><small id="clockL">sec</small></div>
-    </div>
+    <div id="clock" role="timer" aria-label="Seconds left"><b id="clockN">15</b><small id="clockL">sec</small></div>
     <svg id="timebar" viewBox="0 0 169.6 3" preserveAspectRatio="none" aria-hidden="true"><line class="track" x1="0" y1="1.5" x2="169.6" y2="1.5"/><line class="fill" id="clockFill" x1="0" y1="1.5" x2="169.6" y2="1.5" stroke-dasharray="169.6" stroke-dashoffset="0"/></svg>
-    <div id="chips"><span class="chip" id="streak" hidden><b id="streakN">3</b> in a row</span></div>
+    <div id="sub"><span><b id="floorsN">0</b> <span id="floorsL">floors</span></span><span id="streak" hidden><b id="streakN">3</b> in a row</span></div>
   </div>
   <button type="button" id="mute" class="round push" aria-label="Sound" aria-pressed="true">♪</button>
 </div>
-<div id="qbox" class="ui off" aria-live="polite">
-  <img id="qimg" alt="Flag" hidden>
-  <span id="qtag" hidden></span>
-  <div id="qtext"></div>
-</div>
 <div id="answers" class="ui off">
   <div class="wrap">
-    <div id="next"><b id="altN">0 m</b><span id="nextT">Next: a two-storey house, 8 m</span><i id="nextP"></i></div>
+    <div id="qbox" class="off" aria-live="polite">
+      <img id="qimg" alt="Flag" hidden>
+      <span id="qtag" hidden></span>
+      <div id="qtext"></div>
+    </div>
     <div id="opts">
       <button type="button" class="ans push" data-i="0"><span></span></button>
       <button type="button" class="ans push" data-i="1"><span></span></button>
@@ -320,7 +313,6 @@ h1,h2{margin:0;font-weight:500;font-family:var(--display);text-wrap:balance}
     <div class="head">
       <p class="eyebrow" id="rCause">Out of time</p>
       <p class="bigscore"><span id="rScore">0</span><small>floors</small></p>
-      <p class="mark" id="rMark"></p>
       <span class="pill" id="rBest">Record 0</span>
     </div>
     <div class="stats">
@@ -355,12 +347,6 @@ const fmtLong=s=>s>=60?`${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`:`${
 /* Subject hues shared with Lanefall's menus; floors are drawn in deeper shades of the same hue */
 const SHUE={english:'#ff7a5c',math:'#f2c46d',geo:'#5fd39a',science:'#6cb8ff',info:'#b48cff',mix:'#ff7ac6'};
 
-/* Every floor is 3 m. Real landmarks give the height a meaning */
-const M_PER_FLOOR=3;
-const MARKS=[[8,'a two-storey house'],[30,'a blue whale on its tail'],[50,'the Arc de Triomphe'],[56,'the Leaning Tower of Pisa'],[73,'the Taj Mahal'],
-  [84,"Romania's Parliament Palace"],[93,'the Statue of Liberty'],[96,'Big Ben'],[135,'the London Eye'],[139,'the Great Pyramid'],[330,'the Eiffel Tower'],[443,'the Empire State Building'],[828,'the Burj Khalifa']];
-const markFor=m=>{let prev=null,next=null;for(const k of MARKS){if(k[0]<=m)prev=k;else{next=k;break}}return{prev,next}};
-const compare=(m,k)=>k[0]===m?`as tall as ${k[1]}`:`taller than ${k[1]} (${k[0]} m)`;
 
 /* ======================= SETTINGS ======================= */
 const cfg={subject:'english',topic:'irregular',diffs:{},clock:'normal'};
@@ -600,9 +586,7 @@ function flash(color){const f=$('flash');f.style.background=color;f.style.transi
 function paintHud(){const fl=$('floorsN');if(+fl.textContent!==tower.length){fl.textContent=tower.length;fl.classList.remove('bump');void fl.offsetWidth;fl.classList.add('bump')}
   $('floorsL').textContent=tower.length===1?'floor':'floors';
   const st=$('streak');st.hidden=streak<2;if(streak>=2){$('streakN').textContent=streak;st.classList.remove('bounce');void st.offsetWidth;st.classList.add('bounce')}
-  const m=tower.length*M_PER_FLOOR,{prev,next:nx}=markFor(m);$('altN').textContent=`${m} m`;
-  if(nx){$('nextT').textContent=`Next: ${nx[1]}, ${nx[0]} m`;$('nextP').style.setProperty('--p',`${Math.round((m-(prev?prev[0]:0))/(nx[0]-(prev?prev[0]:0))*100)}%`)}
-  else{$('nextT').textContent='Taller than the Burj Khalifa!';$('nextP').style.setProperty('--p','100%')}}
+}
 function paintClock(){const cap=CLK().start+5,low=timeLeft<=5&&state!=='menu';$('clockN').textContent=fmtClock(timeLeft);$('clock').classList.toggle('low',low);
   $('clockFill').style.strokeDashoffset=String(169.6*(1-Math.max(0,Math.min(1,timeLeft/cap))));$('timebar').classList.toggle('low',low)}
 function clockDelta(txt,cls){const l=$('clockL');l.textContent=txt;l.className=cls;clearTimeout(clockDelta.h);clockDelta.h=setTimeout(()=>{l.textContent='sec';l.className=''},900);
@@ -646,8 +630,6 @@ function finish(cause){
   if(isBest)setTimeout(()=>burst('conf',new THREE.Vector3(0,BASE_Y+settledTop()+1,0),60),400);
   setTimeout(()=>{
     $('rCause').textContent=cause==='quit'?'You ended the run':'Out of time';$('rScore').textContent=sc;
-    const m=sc*M_PER_FLOOR,{prev}=markFor(m);const mk=$('rMark');mk.innerHTML='';
-    mk.append(el('b',null,`${m} m`),document.createTextNode(prev?` · ${compare(m,prev)}`:' · keep building to pass a house'));
     const pb=$('rBest');pb.textContent=isBest?'New record':`Your best is ${best}`;pb.classList.toggle('best',isBest);
     $('rTopic').textContent=`${curTopic().name} · ${DIFFNAME[DIFF()].toLowerCase()} · ${CLK().name.toLowerCase()} clock · lasted ${Math.round(played)} s`;
     $('rRight').textContent=`${right}/${asked}`;$('rRight').classList.toggle('long',`${right}/${asked}`.length>5);$('rPeak').textContent=peak;$('rStreak').textContent=bestStreak;
@@ -680,7 +662,7 @@ function applyEmbed(){if(!EMBED)return false;const s=SUBJECTS.find(s=>s.topics.s
   return true}
 
 /* ======================= LOOP ======================= */
-const clock=new THREE.Clock();let t=0,skyF=0;
+const clock=new THREE.Clock();let t=0,skyF=0,viewOff=0;
 const camPos=new THREE.Vector3(10,6,10),look=new THREE.Vector3(0,2,0),lookTo=new THREE.Vector3(),camTo=new THREE.Vector3();
 paintPalette();reset();go('scrHome');paintAudio();
 if(applyEmbed()){rope.visible=true;start()}toParent({type:'edu-ready',game:'stackfall'});
@@ -740,8 +722,9 @@ function frame(){
   cam.position.copy(camPos);
   if(shake>0){shake-=realDt;const a=shake*.7;cam.position.x+=(Math.random()-.5)*a;cam.position.y+=(Math.random()-.5)*a}
   cam.lookAt(look);sky.position.copy(cam.position);
-  /* on the results, shift the picture up so the whole tower stands above the result card */
-  if(state==='over'&&portrait){if(!cam.view||!cam.view.enabled||cam.view.offsetY!==Math.round(H()*.36))cam.setViewOffset(W(),H(),0,Math.round(H()*.36),W(),H())}else if(cam.view&&cam.view.enabled)cam.clearViewOffset();
+  /* shift the picture up: during play the top of the tower clears the question, on the results the whole tower sits above the card */
+  viewOff+=((state==='over'&&portrait?.36:(state==='run'||state==='count'||state==='paused')?.13:0)-viewOff)*Math.min(1,realDt*4);
+  const oy=Math.round(H()*viewOff);if(oy){if(!cam.view||!cam.view.enabled||cam.view.offsetY!==oy)cam.setViewOffset(W(),H(),0,oy,W(),H())}else if(cam.view&&cam.view.enabled)cam.clearViewOffset();
   sun.position.set(8,top+14,6);sun.target.position.set(0,top-3,0);
   recFrame.material.opacity=.55+Math.sin(t*3)*.35;
   R.render(scene,cam);

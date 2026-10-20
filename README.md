@@ -10,7 +10,7 @@ Educational tower stacker. Pick a subject, topic, difficulty and clock, then bui
   - The bonus shrinks by 0.5 s every 8 right answers (never below 0.5 s) and the clock tops out at start + 5 s, so every run ends
 - Record: the tower's height when the clock hits zero, kept per topic, difficulty and clock
 
-Same family as [Lanefall](https://github.com/aosmann/lanefall): the same minimal dark-glass interface, type and ember accent, no build step, works offline and installs to the iPhone home screen. The scene is the app icon's world: a dusk sky that deepens to night as the tower climbs, plain warm slabs, and the next floor swinging from a crane. Height is shown in metres against real landmarks (3 m per floor).
+Same family as [Lanefall](https://github.com/aosmann/lanefall): the same minimal dark-glass interface, type and ember accent, no build step, works offline and installs to the iPhone home screen. The scene is the app icon's world: a dusk sky that deepens to night as the tower climbs, plain warm slabs, and the next floor swinging from a crane.
 
 ## Files
 - `index.html` — the game (Three.js scene, menus, audio, scoring)
