@@ -40,7 +40,7 @@ button:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
   padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
 .off{opacity:0!important;pointer-events:none!important;visibility:hidden}
 .push{cursor:pointer}
-.eyebrow{font:500 10px/1 var(--mono);letter-spacing:.28em;text-transform:uppercase;color:var(--dim);margin:0}
+.eyebrow{font:400 13px/1.3 var(--mono);color:var(--soft);margin:0}
 
 /* ---------- HUD ---------- */
 #hud{top:calc(10px + env(safe-area-inset-top,0px));display:grid;grid-template-columns:44px 1fr 44px;align-items:start;transition:opacity .4s,visibility .4s}
@@ -53,7 +53,9 @@ button:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
 #meters{display:flex;gap:8px}
 .meter{display:grid;justify-items:center;gap:3px;background:rgba(8,11,16,.82);padding:5px 16px 7px;border-radius:14px;min-width:78px}
 .meter b{font:400 40px/1 var(--display);font-variant-numeric:tabular-nums}
-.meter small{font:500 9px/1 var(--mono);letter-spacing:.22em;text-transform:uppercase;color:var(--dim)}
+.meter small{font:400 11px/1 var(--mono);color:var(--dim);transition:color .2s}
+#clockL.good{color:var(--good)} #clockL.bad{color:var(--bad)}
+#clockN.bump{animation:bump .25s ease-out}
 #floorsN.bump{animation:bump .25s ease-out}
 @keyframes bump{50%{transform:scale(1.14)}}
 #clock.low b{color:var(--bad)}
@@ -65,7 +67,7 @@ button:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
 #timebar .fill{stroke:var(--ink);transition:stroke .3s}
 #clock.low ~ #timebar .fill,#timebar.low .fill{stroke:var(--bad)}
 #chips{display:flex;gap:6px;justify-content:center;min-height:24px}
-.chip{font:500 10px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;padding:6px 9px;border-radius:999px;border:1px solid rgba(255,210,63,.5);
+.chip{font:500 12px/1 var(--mono);padding:6px 10px;border-radius:999px;border:1px solid rgba(255,210,63,.5);
   background:var(--glass);color:var(--gold);font-variant-numeric:tabular-nums}
 .chip b{font-weight:500}
 #streak.bounce{animation:bump .3s ease-out}
@@ -76,7 +78,7 @@ button:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
 #qimg{height:64px;width:auto;border-radius:4px;box-shadow:0 8px 28px rgba(0,0,0,.55)}
 #qtext{font:500 clamp(26px,7.4vw,40px)/1.08 var(--display);text-align:center;text-wrap:balance;max-width:min(22ch,100%);background:var(--plate);padding:10px 20px 13px;border-radius:18px;color:#fff;overflow-wrap:anywhere}
 #qtext.code{font:500 clamp(20px,5.8vw,27px)/1.2 var(--mono);max-width:100%}
-#qtag{font:500 10px/1 var(--mono);letter-spacing:.24em;text-transform:uppercase;color:var(--soft);background:var(--plate);padding:6px 10px;border-radius:999px}
+#qtag{font:400 12px/1 var(--mono);color:var(--soft);background:var(--plate);padding:6px 10px;border-radius:999px}
 #qbox.wrong #qtext{animation:shake .4s}
 @keyframes shake{20%{transform:translateX(-5px)}40%{transform:translateX(5px)}60%{transform:translateX(-3px)}80%{transform:translateX(2px)}}
 #answers{bottom:0;padding-bottom:calc(14px + env(safe-area-inset-bottom,0px));transition:opacity .25s,transform .25s,visibility .25s}
@@ -88,18 +90,12 @@ button:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
 #next i{display:block;width:40px;height:2px;border-radius:1px;background:var(--line2);overflow:hidden;flex:none}
 #next i::after{content:"";display:block;height:100%;width:var(--p,0%);background:var(--gold);transition:width .4s}
 #opts{display:grid;gap:8px}
-.ans{pointer-events:auto;display:grid;grid-template-columns:24px minmax(0,1fr) 24px;align-items:center;gap:10px;min-height:56px;padding:8px 14px;
-  border-radius:14px;border:1.5px solid rgba(255,255,255,.2);background:rgba(8,11,16,.88);color:#fff;text-align:center;font:500 16px/1.25 var(--mono);
-  transition:border-color .15s,background .15s,transform .1s,opacity .15s}
+.ans{pointer-events:auto;display:grid;place-items:center;min-height:56px;padding:10px 16px;border-radius:14px;border:1px solid rgba(255,255,255,.16);
+  background:rgba(8,11,16,.86);color:#fff;text-align:center;font:500 17px/1.25 var(--mono);transition:border-color .15s,background .15s,transform .1s,opacity .15s}
 .ans:active{transform:scale(.985)}
 .ans span{min-width:0;overflow-wrap:anywhere}
-.shape{display:grid;place-items:center}
-.shape svg{width:12px;height:12px;fill:var(--dim)}
-.ans kbd{font:500 11px/1 var(--mono);color:var(--dim)}
-.ans.ok{border-color:var(--good);background:rgba(95,211,154,.18)}
-.ans.ok .shape svg{fill:var(--good)}
-.ans.no{border-color:var(--bad);background:rgba(255,107,90,.16);animation:shake .4s}
-.ans.no .shape svg{fill:var(--bad)}
+.ans.ok{border-color:var(--good);background:rgba(95,211,154,.2)}
+.ans.no{border-color:var(--bad);background:rgba(255,107,90,.18);animation:shake .4s}
 .ans.dim{opacity:.35}
 #answers.lock .ans{cursor:default}
 @media (min-width:760px){#opts{grid-template-columns:repeat(3,minmax(0,1fr))}.wrap{width:min(100%,820px)}.ans{min-height:72px}}
@@ -113,15 +109,11 @@ button:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
   display:grid;justify-items:center;transition:opacity .45s,transform .45s,visibility .45s}
 #banner.off{transform:translate(-50%,12px)}
 #banner b{font:400 italic clamp(32px,9vw,46px)/1.05 var(--display);color:var(--bc,var(--gold))}
-#banner small{display:block;font:500 11px/1.6 var(--mono);letter-spacing:.2em;text-transform:uppercase;color:var(--ink);margin-top:6px}
+#banner small{display:block;font:400 13px/1.5 var(--mono);color:var(--soft);margin-top:4px}
 #count{top:28%;display:grid;justify-items:center;gap:18px;text-align:center}
 #countN{font:300 italic 120px/1 var(--display);color:#fff;text-shadow:0 0 3px #000,0 0 14px rgba(0,0,0,.7),0 6px 34px rgba(0,0,0,.8)}
 #countN.tick{animation:tick .9s ease-out}
 @keyframes tick{0%{transform:scale(1.4);opacity:0}25%{opacity:1}100%{transform:scale(.9);opacity:.15}}
-.rules{display:grid;gap:10px;padding:14px 16px;border-radius:16px;border:1px solid var(--line);background:var(--plate);text-align:left}
-.rule{display:grid;grid-template-columns:44px minmax(0,1fr);align-items:center;gap:12px;font:400 13px/1.35 var(--mono);color:var(--soft)}
-.rule b{display:grid;place-items:center;height:30px;border-radius:8px;border:1px solid var(--line2);font:400 20px/1 var(--display)}
-.rule .g{color:var(--good)} .rule .r{color:var(--bad)} .rule .y{color:var(--gold)}
 #flash{position:fixed;inset:0;pointer-events:none;opacity:0}
 
 /* ---------- Menus ---------- */
@@ -156,10 +148,10 @@ h1,h2{margin:0;font-weight:500;font-family:var(--display);text-wrap:balance}
 .brandbig em{font-style:normal;color:var(--gold)}
 .home .lead{text-align:center}
 .bottom{display:grid;gap:14px}
-.cta{width:100%;height:58px;border:0;border-radius:16px;background:var(--ember);color:#fff;font:500 14px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;transition:transform .1s,background .15s}
+.cta{width:100%;height:58px;border:0;border-radius:16px;background:var(--ember);color:#fff;font:500 16px/1 var(--mono);transition:transform .1s,background .15s}
 .cta:active{transform:scale(.985);background:var(--ember2)}
-.cta.big{height:66px;font-size:17px;letter-spacing:.24em}
-.ghost{width:100%;height:52px;border-radius:16px;border:1px solid var(--line2);background:var(--chip);font:500 13px/1 var(--mono);letter-spacing:.08em;color:var(--ink)}
+.cta.big{height:64px;font-size:18px}
+.ghost{width:100%;height:52px;border-radius:16px;border:1px solid var(--line2);background:var(--chip);font:500 15px/1 var(--mono);color:var(--ink)}
 .back{display:inline-flex;align-items:center;gap:8px;height:44px;padding:0 18px 0 14px;border-radius:999px;border:1px solid var(--line2);background:var(--chip);font:500 13px/1 var(--mono);color:var(--ink)}
 .back span{font-size:17px}
 .grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
@@ -187,7 +179,7 @@ h1,h2{margin:0;font-weight:500;font-family:var(--display);text-wrap:balance}
   padding:22px max(16px,env(safe-area-inset-right,0px)) calc(14px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));
   background:linear-gradient(rgba(6,9,13,0),#06090d 22px)}
 .seg3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:4px;padding:4px;border-radius:14px;background:rgba(232,238,244,.06);border:1px solid var(--line)}
-.seg3 button{height:40px;border:0;border-radius:10px;background:none;cursor:pointer;font:600 12px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--soft);transition:background .15s,color .15s,transform .1s}
+.seg3 button{height:40px;border:0;border-radius:10px;background:none;cursor:pointer;font:500 13px/1 var(--mono);color:var(--soft);transition:background .15s,color .15s,transform .1s}
 .seg3 button.d1{color:#3ddc84}.seg3 button.d2{color:#ffc233}.seg3 button.d3{color:#ff5a4a}
 .seg3 button[aria-pressed="true"]{color:#0b0f14;transform:scale(1.02)}
 .seg3 button.d1[aria-pressed="true"]{background:#3ddc84}
@@ -198,7 +190,7 @@ h1,h2{margin:0;font-weight:500;font-family:var(--display);text-wrap:balance}
 .center .head,.low .head{text-align:center;justify-items:center}
 .bigscore{font:400 88px/.95 var(--display);font-variant-numeric:tabular-nums;margin:0}
 .bigscore small{font:400 italic 26px/1 var(--display);color:var(--soft);margin-left:6px}
-.pill{font:500 11px/1 var(--mono);letter-spacing:.16em;text-transform:uppercase;padding:7px 12px;border-radius:999px;border:1px solid var(--line2);color:var(--soft);margin:0}
+.pill{font:400 13px/1 var(--mono);padding:7px 12px;border-radius:999px;border:1px solid var(--line2);color:var(--soft);margin:0}
 .pill.best{border-color:rgba(255,210,63,.6);color:var(--gold)}
 .mark{font:400 13px/1.5 var(--mono);color:var(--soft);margin:0;text-align:center;text-wrap:balance}
 .mark b{font:400 italic 22px/1 var(--display);color:var(--ink)}
@@ -207,9 +199,9 @@ h1,h2{margin:0;font-weight:500;font-family:var(--display);text-wrap:balance}
 .stats div+div{border-left:1px solid var(--line2)}
 .stats strong{font:500 26px/1 var(--display);font-variant-numeric:tabular-nums;white-space:nowrap}
 .stats strong.long{font-size:21px}
-.stats span{font:400 10px/1.25 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--soft)}
+.stats span{font:400 12px/1.25 var(--mono);color:var(--soft)}
 .review{display:grid;gap:10px}
-.review h3{margin:0;font:500 10px/1 var(--mono);letter-spacing:.28em;text-transform:uppercase;color:var(--dim)}
+.review h3{margin:0;font:400 13px/1 var(--mono);color:var(--soft)}
 .review ol{list-style:none;margin:0;padding:0;display:grid;gap:8px}
 .review li{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:center;padding:12px 14px;border-radius:12px;background:var(--chip);font:400 13px/1.35 var(--mono)}
 .review li > span{color:var(--soft);min-width:0;display:flex;align-items:center;gap:8px;overflow-wrap:anywhere}
@@ -218,7 +210,8 @@ h1,h2{margin:0;font-weight:500;font-family:var(--display);text-wrap:balance}
 .review li s{color:var(--bad);text-decoration-thickness:1px;margin-right:8px}
 .review li b{color:var(--good);font-weight:500}
 .perfect{font:400 italic 20px/1.3 var(--display);color:var(--good);text-align:center;margin:0}
-.foot{font:400 11px/1.4 var(--mono);color:var(--dim);text-align:center;margin:0}
+.foot{font:400 12px/1.4 var(--mono);color:var(--dim);text-align:center;margin:0}
+.hint{font:400 12px/1.45 var(--mono);color:var(--soft);margin:0;text-align:center}
 @media (prefers-reduced-motion:reduce){#countN.tick,#clock.low{animation:none}*{transition-duration:.01s!important}}
 </style>
 </head>
@@ -230,7 +223,7 @@ h1,h2{margin:0;font-weight:500;font-family:var(--display);text-wrap:balance}
   <div id="mid">
     <div id="meters">
       <div class="meter" id="floors"><b id="floorsN">0</b><small id="floorsL">floors</small></div>
-      <div class="meter" id="clock" role="timer" aria-label="Seconds left"><b id="clockN">60</b><small>left</small></div>
+      <div class="meter" id="clock" role="timer" aria-label="Seconds left"><b id="clockN">15</b><small id="clockL">sec</small></div>
     </div>
     <svg id="timebar" viewBox="0 0 169.6 3" preserveAspectRatio="none" aria-hidden="true"><line class="track" x1="0" y1="1.5" x2="169.6" y2="1.5"/><line class="fill" id="clockFill" x1="0" y1="1.5" x2="169.6" y2="1.5" stroke-dasharray="169.6" stroke-dashoffset="0"/></svg>
     <div id="chips"><span class="chip" id="streak" hidden><b id="streakN">3</b> in a row</span></div>
@@ -246,9 +239,9 @@ h1,h2{margin:0;font-weight:500;font-family:var(--display);text-wrap:balance}
   <div class="wrap">
     <div id="next"><b id="altN">0 m</b><span id="nextT">Next: a two-storey house, 8 m</span><i id="nextP"></i></div>
     <div id="opts">
-      <button type="button" class="ans push" data-i="0"><span class="shape"><svg viewBox="0 0 20 20"><path d="M10 2.5 18.5 17h-17z"/></svg></span><span></span><kbd>1</kbd></button>
-      <button type="button" class="ans push" data-i="1"><span class="shape"><svg viewBox="0 0 20 20"><path d="M10 1.5 18.5 10 10 18.5 1.5 10z"/></svg></span><span></span><kbd>2</kbd></button>
-      <button type="button" class="ans push" data-i="2"><span class="shape"><svg viewBox="0 0 20 20"><circle cx="10" cy="10" r="8.2"/></svg></span><span></span><kbd>3</kbd></button>
+      <button type="button" class="ans push" data-i="0"><span></span></button>
+      <button type="button" class="ans push" data-i="1"><span></span></button>
+      <button type="button" class="ans push" data-i="2"><span></span></button>
     </div>
   </div>
 </div>
@@ -256,11 +249,6 @@ h1,h2{margin:0;font-weight:500;font-family:var(--display);text-wrap:balance}
 <div id="banner" class="ui off"><b id="bannerB"></b><small id="bannerS"></small></div>
 <div id="count" class="ui off">
   <div id="countN"></div>
-  <div class="rules">
-    <div class="rule"><b class="g">+1</b>Right answer drops a floor</div>
-    <div class="rule"><b class="r">−3</b>Wrong answer knocks 3 off</div>
-    <div class="rule"><b class="y">+2</b>5 in a row adds a gold floor</div>
-  </div>
 </div>
 <div id="flash"></div>
 
@@ -277,15 +265,10 @@ h1,h2{margin:0;font-weight:500;font-family:var(--display);text-wrap:balance}
         </header>
         <div class="brand">
           <h1 class="brandbig">Stack<em>fall</em></h1>
-          <p class="lead">Answer right. Build to the sky.</p>
+          <p class="lead">Right answers stack up. Wrong ones knock it down.</p>
         </div>
       </div>
       <div class="bottom">
-        <div class="rules">
-          <div class="rule"><b class="g">+1</b>Every right answer drops a floor</div>
-          <div class="rule"><b class="r">−3</b>A wrong one knocks the top 3 off</div>
-          <div class="rule"><b class="y">+2</b>Five in a row adds a gold floor</div>
-        </div>
         <button type="button" class="cta big push" id="playBtn">Play</button>
       </div>
     </section>
@@ -293,17 +276,15 @@ h1,h2{margin:0;font-weight:500;font-family:var(--display);text-wrap:balance}
     <section class="screen pb" id="stepSubj" hidden>
       <header class="topbar">
         <button type="button" class="back push" data-go="scrHome"><span aria-hidden="true">←</span>Home</button>
-        <p class="eyebrow">Step 1 of 2</p>
-      </header>
-      <div class="head"><h1>Choose a subject</h1></div>
+              </header>
+      <div class="head"><h1>Pick a subject</h1></div>
       <div class="grid2" id="subjects"></div>
     </section>
 
     <section class="screen" id="stepTopic" hidden>
       <header class="topbar">
         <button type="button" class="back push" data-go="stepSubj"><span aria-hidden="true">←</span>Subjects</button>
-        <p class="eyebrow">Step 2 of 2</p>
-      </header>
+              </header>
       <div class="head"><h1 id="subName"></h1></div>
       <div class="list" id="topics"></div>
       <div class="footer">
@@ -312,18 +293,19 @@ h1,h2{margin:0;font-weight:500;font-family:var(--display);text-wrap:balance}
           <button type="button" class="d2" data-d="2">Medium</button>
           <button type="button" class="d3" data-d="3">Hard</button>
         </div>
-        <div class="seg3 time" id="timeSeg" role="group" aria-label="Time limit">
-          <button type="button" data-t="60">60 sec</button>
-          <button type="button" data-t="90">90 sec</button>
-          <button type="button" data-t="120">2 min</button>
+        <div class="seg3 time" id="clockSeg" role="group" aria-label="Clock">
+          <button type="button" data-c="quick">Quick</button>
+          <button type="button" data-c="normal">Normal</button>
+          <button type="button" data-c="relaxed">Relaxed</button>
         </div>
+        <p class="hint" id="clockHint"></p>
         <button type="button" class="cta push" id="startBtn">Start</button>
       </div>
     </section>
   </div>
 
   <section class="screen center" id="pauseP" hidden>
-    <div class="head"><p class="eyebrow">Paused</p><p class="lead" id="pLine"></p></div>
+    <div class="head"><h1>Paused</h1><p class="lead" id="pLine"></p></div>
     <div class="audio" style="justify-content:center">
       <button type="button" class="toggle push" id="musicT2" aria-pressed="true"><i></i>Music</button>
       <button type="button" class="toggle push" id="sfxT2" aria-pressed="true"><i></i>Sound</button>
@@ -336,20 +318,20 @@ h1,h2{margin:0;font-weight:500;font-family:var(--display);text-wrap:balance}
 
   <section class="screen low" id="over" hidden>
     <div class="head">
-      <p class="eyebrow" id="rCause">Time's up</p>
+      <p class="eyebrow" id="rCause">Out of time</p>
       <p class="bigscore"><span id="rScore">0</span><small>floors</small></p>
       <p class="mark" id="rMark"></p>
       <span class="pill" id="rBest">Record 0</span>
     </div>
     <div class="stats">
-      <div><strong id="rRight">0/0</strong><span>Answers right</span></div>
-      <div><strong id="rPeak">0</strong><span>Tallest tower</span></div>
+      <div><strong id="rRight">0/0</strong><span>Right</span></div>
+      <div><strong id="rPeak">0</strong><span>Tallest</span></div>
       <div><strong id="rStreak">0</strong><span>Best streak</span></div>
     </div>
     <div class="review" id="review"></div>
     <div class="actions">
-      <button type="button" class="cta push" id="againBtn">Build again</button>
-      <button type="button" class="ghost push" id="menuBtn">Choose another topic</button>
+      <button type="button" class="cta push" id="againBtn">Play again</button>
+      <button type="button" class="ghost push" id="menuBtn">Change topic</button>
     </div>
     <p class="foot" id="rTopic"></p>
   </section>
@@ -363,6 +345,12 @@ const $=id=>document.getElementById(id);
 const {SUBJECTS,SICON,DIFFNAME,stream,ri}=EduQ;
 const el=(tag,cls,text)=>{const e=document.createElement(tag);if(cls)e.className=cls;if(text!=null)e.textContent=text;return e};
 const fmtT=s=>{s=Math.max(0,Math.ceil(s));return s>=60?`${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`:String(s)};
+/* Chess-clock style: start with a few seconds, right answers add time, wrong ones take it away.
+   The clock only runs while a question is up. Bonus time shrinks by 0.5 s every 8 right answers (never below 0.5 s),
+   and the clock can't go above start + 5 s, so every run ends sooner or later. */
+const CLOCKS={quick:{name:'Quick',start:10,plus:2,minus:2},normal:{name:'Normal',start:15,plus:2,minus:2},relaxed:{name:'Relaxed',start:20,plus:3,minus:2}};
+const fmtClock=s=>s<=0?'0':s<5?s.toFixed(1):String(Math.ceil(s));
+const clockHint=c=>`Start with ${c.start} s. Right answers add ${c.plus} s, wrong ones take ${c.minus} s.`;
 const fmtLong=s=>s>=60?`${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`:`${s} sec`;
 /* Subject hues shared with Lanefall's menus; floors are drawn in deeper shades of the same hue */
 const SHUE={english:'#ff7a5c',math:'#f2c46d',geo:'#5fd39a',science:'#6cb8ff',info:'#b48cff',mix:'#ff7ac6'};
@@ -375,14 +363,16 @@ const markFor=m=>{let prev=null,next=null;for(const k of MARKS){if(k[0]<=m)prev=
 const compare=(m,k)=>k[0]===m?`as tall as ${k[1]}`:`taller than ${k[1]} (${k[0]} m)`;
 
 /* ======================= SETTINGS ======================= */
-const cfg={subject:'english',topic:'irregular',diffs:{},time:60};
+const cfg={subject:'english',topic:'irregular',diffs:{},clock:'normal'};
 try{const s=JSON.parse(localStorage.getItem('stackfall-cfg')||'{}');Object.assign(cfg,s);if(!cfg.diffs)cfg.diffs={}}catch(e){}
+if(!CLOCKS[cfg.clock])cfg.clock='normal';delete cfg.time;
+const CLK=()=>CLOCKS[cfg.clock]||CLOCKS.normal;
 const saveCfg=()=>{try{localStorage.setItem('stackfall-cfg',JSON.stringify(cfg))}catch(e){}};
 const curSubject=()=>SUBJECTS.find(s=>s.id===cfg.subject)||SUBJECTS[0];
 const curTopic=()=>{const s=curSubject();return s.topics.find(t=>t.id===cfg.topic)||s.topics[0]};
 const topicDiff=tp=>cfg.diffs[tp.id]||tp.d;
 const DIFF=()=>topicDiff(curTopic());
-const bestKey=(id,d,t)=>`stackfall-best-${id||curTopic().id}-d${d||DIFF()}-t${t||cfg.time}`;
+const bestKey=(id,d,t)=>`stackfall-best-${id||curTopic().id}-d${d||DIFF()}-c${t||cfg.clock}`;
 const getBest=(id,d,t)=>{try{return +localStorage.getItem(bestKey(id,d,t))||0}catch(e){return 0}};
 
 /* Results log for the future portal: kept locally, and posted to a parent page if Stackfall runs inside one */
@@ -401,13 +391,13 @@ function renderTopics(){const s=curSubject(),t=curTopic();cfg.topic=t.id;$('subN
   const box=$('topics');box.innerHTML='';box.style.setProperty('--h',SHUE[s.id]);
   s.topics.forEach(tp=>{const b=el('button','row');b.type='button';b.setAttribute('aria-pressed',tp.id===cfg.topic);
     const tx=el('span','tx');tx.append(el('strong',null,tp.name),el('span',null,tp.bl));
-    const side=el('span');const bs=getBest(tp.id,topicDiff(tp));if(bs)side.append(el('span','best',`${bs} fl`));
+    const side=el('span');const bs=getBest(tp.id,topicDiff(tp));if(bs)side.append(el('span','best',`best ${bs}`));
     b.append(el('span','radio'),tx,side);b.onclick=()=>{cfg.topic=tp.id;saveCfg();renderTopics()};box.append(b)});
-  $('startBtn').textContent=`Start · ${t.name}`;
+  $('startBtn').textContent='Start';$('clockHint').textContent=clockHint(CLK());
   document.querySelectorAll('#diffSeg button').forEach(b=>b.setAttribute('aria-pressed',+b.dataset.d===DIFF()));
-  document.querySelectorAll('#timeSeg button').forEach(b=>b.setAttribute('aria-pressed',+b.dataset.t===cfg.time))}
+  document.querySelectorAll('#clockSeg button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.c===cfg.clock))}
 document.querySelectorAll('#diffSeg button').forEach(b=>b.onclick=()=>{cfg.diffs[curTopic().id]=+b.dataset.d;saveCfg();renderTopics()});
-document.querySelectorAll('#timeSeg button').forEach(b=>b.onclick=()=>{cfg.time=+b.dataset.t;saveCfg();renderTopics()});
+document.querySelectorAll('#clockSeg button').forEach(b=>b.onclick=()=>{cfg.clock=b.dataset.c;saveCfg();renderTopics()});
 const SCREENS=['scrHome','stepSubj','stepTopic'];
 function go(id){SCREENS.forEach(x=>$(x).hidden=x!==id);$('sheet').classList.toggle('peek',id==='scrHome');
   ({scrHome:()=>{},stepSubj:renderSubjects,stepTopic:renderTopics})[id]();$('sheet').scrollTop=0}
@@ -589,12 +579,12 @@ const recFrame=new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.BoxGeome
 let recTex=null;const recSprite=new THREE.Sprite(new THREE.SpriteMaterial({transparent:true,depthWrite:false,depthTest:false}));recSprite.scale.set(1.9,.5,1);recSprite.position.set(0,.38,0);recordG.add(recSprite);
 function setRecord(n,beaten){recordG.visible=n>0;if(!n)return;recordG.position.y=n*FH;
   if(recTex)recTex.dispose();recTex=canvasTex(256,68,(x,w,h)=>{x.fillStyle='rgba(8,11,16,.88)';x.beginPath();x.roundRect?x.roundRect(4,6,w-8,h-16,22):x.rect(4,6,w-8,h-16);x.fill();
-    x.fillStyle=beaten?'#5fd39a':'#ff6a4f';x.font='500 24px "IBM Plex Mono",Menlo,monospace';x.textAlign='center';x.textBaseline='middle';x.fillText(beaten?'RECORD BEATEN':`RECORD ${n}`,w/2,h/2-3)});
+    x.fillStyle=beaten?'#5fd39a':'#ff6a4f';x.font='500 24px "IBM Plex Mono",Menlo,monospace';x.textAlign='center';x.textBaseline='middle';x.fillText(beaten?'Record beaten':`Record ${n}`,w/2,h/2-3)});
   recSprite.material.map=recTex;recSprite.material.needsUpdate=true;recFrame.material.color.set(beaten?0x5fd39a:0xff6a4f)}
 
 /* ======================= GAME STATE ======================= */
 // states: menu · count · run · paused · over
-let state='menu',timeLeft=60,countT=0,next=null,cur=null,lock=false,lastSec=0,pausedFrom='run';
+let state='menu',timeLeft=60,countT=0,next=null,cur=null,lock=false,lastSec=0,pausedFrom='run',played=0;
 let right=0,asked=0,streak=0,bestStreak=0,peak=0,missed=[],best=0,beat=false,wob=0,wobV=0,shake=0,freeze=0,menuT=0,orbit=.8;
 const show=(id,on)=>$(id).classList.toggle('off',!on);
 const ansEls=[...document.querySelectorAll('.ans')];
@@ -613,57 +603,59 @@ function paintHud(){const fl=$('floorsN');if(+fl.textContent!==tower.length){fl.
   const m=tower.length*M_PER_FLOOR,{prev,next:nx}=markFor(m);$('altN').textContent=`${m} m`;
   if(nx){$('nextT').textContent=`Next: ${nx[1]}, ${nx[0]} m`;$('nextP').style.setProperty('--p',`${Math.round((m-(prev?prev[0]:0))/(nx[0]-(prev?prev[0]:0))*100)}%`)}
   else{$('nextT').textContent='Taller than the Burj Khalifa!';$('nextP').style.setProperty('--p','100%')}}
-function paintClock(){$('clockN').textContent=fmtT(timeLeft);$('clock').classList.toggle('low',timeLeft<=10&&state!=='menu');
-  $('clockFill').style.strokeDashoffset=String(169.6*(1-Math.max(0,timeLeft/cfg.time)));$('timebar').classList.toggle('low',timeLeft<=10&&state!=='menu')}
+function paintClock(){const cap=CLK().start+5,low=timeLeft<=5&&state!=='menu';$('clockN').textContent=fmtClock(timeLeft);$('clock').classList.toggle('low',low);
+  $('clockFill').style.strokeDashoffset=String(169.6*(1-Math.max(0,Math.min(1,timeLeft/cap))));$('timebar').classList.toggle('low',low)}
+function clockDelta(txt,cls){const l=$('clockL');l.textContent=txt;l.className=cls;clearTimeout(clockDelta.h);clockDelta.h=setTimeout(()=>{l.textContent='sec';l.className=''},900);
+  const b=$('clockN');b.classList.remove('bump');void b.offsetWidth;b.classList.add('bump')}
 
-function reset(){clearTower();right=0;asked=0;streak=0;bestStreak=0;peak=0;missed=[];beat=false;timeLeft=cfg.time;lastSec=Math.ceil(timeLeft);
+function reset(){clearTower();right=0;asked=0;streak=0;bestStreak=0;peak=0;missed=[];beat=false;timeLeft=CLK().start;played=0;lastSec=Math.ceil(timeLeft);
   best=getBest();recordG.visible=false;paintHud();paintClock()}
 function start(){reset();setRecord(best,false);next=stream(curTopic(),DIFF());panel(null);show('hud',true);show('qbox',false);show('answers',false);
   state='count';countT=3.2;show('count',true);tickCount(3);paintAudio()}
-function tickCount(n){const c=$('countN');c.textContent=n||'Build!';c.classList.remove('tick');void c.offsetWidth;c.classList.add('tick');S.tick(n)}
+function tickCount(n){const c=$('countN');c.textContent=n||'Go';c.classList.remove('tick');void c.offsetWidth;c.classList.add('tick');S.tick(n)}
 function ask(){cur=next();lock=false;$('answers').classList.remove('lock');const qb=$('qbox');qb.classList.remove('right','wrong');
   const qt=$('qtext');qt.className=cur.code?'code':'';qt.textContent=cur.q;const tg=$('qtag');tg.hidden=!cur.code;tg.textContent=cur.code||'';
   const im=$('qimg');if(cur.img){im.src=cur.img;im.hidden=false}else im.hidden=true;
-  ansEls.forEach((b,i)=>{b.className='ans push';b.querySelectorAll('span')[1].textContent=cur.ans[i]});show('qbox',true);show('answers',true)}
-const CHEER={3:['Nice!','3 in a row'],5:['Gold floor!','5 in a row'],8:['On fire!','8 in a row'],10:['Unstoppable!','10 in a row'],15:['Legendary!','15 in a row'],20:['Genius!','20 in a row']};
+  ansEls.forEach((b,i)=>{b.className='ans push';b.querySelector('span').textContent=cur.ans[i]});show('qbox',true);show('answers',true)}
+const CHEER={3:['Nice','3 in a row'],5:['Gold floor','5 in a row'],8:['On a roll','8 in a row'],10:['Ten straight','still going'],15:['Fifteen straight','not bad at all'],20:['Twenty straight','okay, show-off']};
 function answer(i){
   if(state!=='run'||lock||!cur)return;lock=true;$('answers').classList.add('lock');asked++;
-  const ok=i===cur.correct,qb=$('qbox');
+  const ok=i===cur.correct,qb=$('qbox'),ck=CLK(),bonus=Math.max(.5,ck.plus-.5*Math.floor(right/8));
   ansEls.forEach((b,k)=>{b.classList.add(k===cur.correct?'ok':k===i?'no':'dim')});
-  if(ok){right++;streak++;bestStreak=Math.max(bestStreak,streak);qb.classList.add('right');addBlock(false);S.correct();
+  if(ok){timeLeft=Math.min(ck.start+5,timeLeft+bonus);clockDelta(`+${bonus} s`,'good');right++;streak++;bestStreak=Math.max(bestStreak,streak);qb.classList.add('right');addBlock(false);S.correct();
     const gold=streak%5===0;if(gold)setTimeout(()=>{if(state==='run'||state==='over')addBlock(true)},200);
-    const c=CHEER[streak]||(gold?['Gold floor!',`${streak} in a row`]:null);if(c)banner(c[0],c[1],gold?'var(--sun-d)':'var(--coral-d)')}
-  else{streak=0;qb.classList.add('wrong');missed.push({q:cur.img?'This flag':cur.q,img:cur.img,answer:cur.answer,picked:cur.ans[i]});
+    const c=CHEER[streak]||(gold?['Gold floor',`${streak} in a row`]:null);if(c)banner(c[0],c[1],gold?'var(--sun-d)':'var(--coral-d)')}
+  else{timeLeft=Math.max(0,timeLeft-ck.minus);clockDelta(`−${ck.minus} s`,'bad');streak=0;qb.classList.add('wrong');missed.push({q:cur.img?'This flag':cur.q,img:cur.img,answer:cur.answer,picked:cur.ans[i]});
     const k=knock(3);S.wrong();setTimeout(()=>S.crumble(),60);freeze=.12;shake=.28;flash('#ff4d5e');popAt(settledTop()+FH*2,k?`−${k}`:'Miss','bad')}
   peak=Math.max(peak,tower.length);
-  if(!beat&&best>0&&tower.length>best){beat=true;setRecord(best,true);S.record();setTimeout(()=>{banner('New record!',`Past ${best} floors`,'var(--good-d)');burst('conf',new THREE.Vector3(0,BASE_Y+settledTop()+1,0),46)},350)}
+  if(!beat&&best>0&&tower.length>best){beat=true;setRecord(best,true);S.record();setTimeout(()=>{banner('New record',`past your ${best}`,'var(--good-d)');burst('conf',new THREE.Vector3(0,BASE_Y+settledTop()+1,0),46)},350)}
   paintHud();toParent({type:'edu-progress',game:'stackfall',score:tower.length,right,asked});
   setTimeout(()=>{if(state==='run')ask()},ok?360:950)}
 ansEls.forEach((b,i)=>b.addEventListener('pointerdown',e=>{e.preventDefault();answer(i)}));
 ansEls.forEach((b,i)=>b.addEventListener('click',e=>{if(e.detail===0)answer(i)}));
 
 function pause(){if(state!=='run'&&state!=='count')return;pausedFrom=state;state='paused';show('count',false);
-  $('pLine').textContent=`${tower.length} floors, ${fmtLong(Math.ceil(timeLeft))} left`;panel('pauseP');paintAudio()}
+  $('pLine').textContent=`${tower.length} floors · ${Math.ceil(timeLeft)} s on the clock`;panel('pauseP');paintAudio()}
 function resume(){if(state!=='paused')return;panel(null);state='count';countT=pausedFrom==='count'?3.2:1.2;show('count',true);tickCount(pausedFrom==='count'?3:1);paintAudio()}
 function finish(cause){
   if(state!=='run'&&state!=='paused')return;state='over';show('qbox',false);show('answers',false);show('count',false);S.end();
   if(hang)hang.visible=false;rope.visible=false;
   const sc=tower.length,isBest=sc>best&&sc>0;if(isBest){best=sc;try{localStorage.setItem(bestKey(),best)}catch(e){}}
-  logResult({game:'stackfall',subject:curSubject().id,topic:curTopic().id,topicName:curTopic().name,level:DIFF(),duration:cfg.time,
-    timeUsed:Math.round(cfg.time-timeLeft),score:sc,peak,right,asked,bestStreak,missed:missed.map(m=>({q:m.q,answer:m.answer,picked:m.picked})),at:new Date().toISOString()});
+  logResult({game:'stackfall',subject:curSubject().id,topic:curTopic().id,topicName:curTopic().name,level:DIFF(),clock:cfg.clock,duration:Math.round(played),
+    timeUsed:Math.round(played),score:sc,peak,right,asked,bestStreak,missed:missed.map(m=>({q:m.q,answer:m.answer,picked:m.picked})),at:new Date().toISOString()});
   if(isBest)setTimeout(()=>burst('conf',new THREE.Vector3(0,BASE_Y+settledTop()+1,0),60),400);
   setTimeout(()=>{
-    $('rCause').textContent=cause==='quit'?'Run ended':"Time's up";$('rScore').textContent=sc;
+    $('rCause').textContent=cause==='quit'?'You ended the run':'Out of time';$('rScore').textContent=sc;
     const m=sc*M_PER_FLOOR,{prev}=markFor(m);const mk=$('rMark');mk.innerHTML='';
     mk.append(el('b',null,`${m} m`),document.createTextNode(prev?` · ${compare(m,prev)}`:' · keep building to pass a house'));
-    const pb=$('rBest');pb.textContent=isBest?'New record!':`Record ${best} floors`;pb.classList.toggle('best',isBest);
-    $('rTopic').textContent=`${curSubject().name}, ${curTopic().name}, ${DIFFNAME[DIFF()]}, ${fmtLong(cfg.time)}`;
+    const pb=$('rBest');pb.textContent=isBest?'New record':`Your best is ${best}`;pb.classList.toggle('best',isBest);
+    $('rTopic').textContent=`${curTopic().name} · ${DIFFNAME[DIFF()].toLowerCase()} · ${CLK().name.toLowerCase()} clock · lasted ${Math.round(played)} s`;
     $('rRight').textContent=`${right}/${asked}`;$('rRight').classList.toggle('long',`${right}/${asked}`.length>5);$('rPeak').textContent=peak;$('rStreak').textContent=bestStreak;
     const rv=$('review');rv.innerHTML='';
-    if(missed.length){rv.append(el('h3',null,'Worth another look'));const ol=el('ol'),seen=new Set();
+    if(missed.length){rv.append(el('h3',null,'You missed'));const ol=el('ol'),seen=new Set();
       missed.forEach(m=>{const k=m.q+m.answer+(m.img||'');if(seen.has(k))return;seen.add(k);const li=el('li'),q=el('span');if(m.img){const im=el('img');im.src=m.img;im.alt='';q.append(im)}q.append(m.q);
         const a=el('div');a.append(el('s',null,m.picked),el('b',null,m.answer));li.append(q,a);ol.append(li)});rv.append(ol)}
-    else if(asked)rv.append(el('p','perfect','Every answer right. Not one floor lost.'));
+    else if(asked)rv.append(el('p','perfect','No misses. Clean run.'));
     show('hud',false);panel('over')},cause==='quit'?250:2000)}
 function toMenu(){state='menu';reset();rope.visible=true;show('hud',false);show('qbox',false);show('answers',false);show('count',false);go('stepTopic');panel('menu')}
 $('startBtn').onclick=()=>{rope.visible=true;start()};$('againBtn').onclick=()=>{rope.visible=true;start()};$('menuBtn').onclick=toMenu;
@@ -679,10 +671,10 @@ addEventListener('keydown',e=>{if(e.repeat)return;
    Opened by the portal as ?topic=<id>&level=1-3&time=60|90|120&lock=1 → settings come from the portal and the run starts at once.
    lock=1 (class mode): no replay, no topic menu. Posts edu-ready on load, edu-progress after every answer, edu-result at the end. */
 const EMBED=(()=>{const p=new URLSearchParams(location.search);if(!p.get('topic'))return null;
-  return{topic:p.get('topic'),level:+p.get('level')||0,time:+p.get('time')||0,lock:p.get('lock')==='1'}})();
+  return{topic:p.get('topic'),level:+p.get('level')||0,clock:p.get('clock'),lock:p.get('lock')==='1'}})();
 const toParent=m=>{try{if(window.parent!==window)window.parent.postMessage(m,'*')}catch(e){}};
 function applyEmbed(){if(!EMBED)return false;const s=SUBJECTS.find(s=>s.topics.some(t=>t.id===EMBED.topic));if(!s)return false;
-  cfg.subject=s.id;cfg.topic=EMBED.topic;if([1,2,3].includes(EMBED.level))cfg.diffs[EMBED.topic]=EMBED.level;if([60,90,120].includes(EMBED.time))cfg.time=EMBED.time;
+  cfg.subject=s.id;cfg.topic=EMBED.topic;if([1,2,3].includes(EMBED.level))cfg.diffs[EMBED.topic]=EMBED.level;if(CLOCKS[EMBED.clock])cfg.clock=EMBED.clock;
   if(EMBED.lock){$('againBtn').hidden=true;$('menuBtn').hidden=true;const n=document.createElement('p');n.textContent='Result sent to your teacher.';
     n.style.cssText='margin:0;text-align:center;color:var(--soft);font:400 13px/1.4 var(--mono)';$('againBtn').parentNode.prepend(n)}
   return true}
@@ -700,7 +692,7 @@ function frame(){
   t+=dt;
   if(state==='count'){const prev=Math.ceil(countT-.2);countT-=realDt;const now=Math.ceil(countT-.2);if(now!==prev)tickCount(Math.max(0,now));
     if(countT<=0){state='run';show('count',false);if(!cur||asked===0||lock)ask();else{show('qbox',true);show('answers',true)}S.bell()}}
-  if(state==='run'){timeLeft-=realDt;const sec=Math.ceil(timeLeft);if(sec!==lastSec){lastSec=sec;if(sec<=10&&sec>0)S.clock()}paintClock();if(timeLeft<=0){timeLeft=0;paintClock();finish('time')}}
+  if(state==='run'){if(!lock){timeLeft-=realDt;played+=realDt}const sec=Math.ceil(timeLeft);if(sec!==lastSec){lastSec=sec;if(sec<=5&&sec>0)S.clock()}paintClock();if(timeLeft<=0){timeLeft=0;paintClock();finish('time')}}
   if(state==='menu'){menuT-=dt;if(menuT<=0){if(tower.length>=10||(tower.length>6&&Math.random()<.15)){knock(3);S.crumble();menuT=1.5}else{addBlock(Math.random()<.1);menuT=.8+Math.random()*.6}}}
 
   /* the hanging floor swings like a pendulum and eases down from the crane when it appears */

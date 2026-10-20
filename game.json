@@ -3,13 +3,49 @@
   "id": "stackfall",
   "name": "Stackfall",
   "pitch": "Answer right. Build to the sky.",
-  "description": "Every right answer drops a floor onto the tower, a wrong one knocks three off. Build as tall as you can before the clock runs out.",
+  "description": "Every right answer drops a floor and adds a couple of seconds; a wrong one knocks three floors off and takes time away. Build as tall as you can before the clock hits zero.",
   "color": "#ff6b57",
   "icon": "icon-512.png",
   "bank": "EduQ",
   "score": "floors",
   "settings": [
-    {"key": "level", "label": "Difficulty", "options": [[1, "Easy"], [2, "Medium"], [3, "Hard"]], "default": "topic"},
-    {"key": "time", "label": "Time limit", "options": [[60, "60 sec"], [90, "90 sec"], [120, "2 min"]], "default": 60}
+    {
+      "key": "level",
+      "label": "Difficulty",
+      "options": [
+        [
+          1,
+          "Easy"
+        ],
+        [
+          2,
+          "Medium"
+        ],
+        [
+          3,
+          "Hard"
+        ]
+      ],
+      "default": "topic"
+    },
+    {
+      "key": "clock",
+      "label": "Clock",
+      "options": [
+        [
+          "quick",
+          "Quick · 10 s"
+        ],
+        [
+          "normal",
+          "Normal · 15 s"
+        ],
+        [
+          "relaxed",
+          "Relaxed · 20 s"
+        ]
+      ],
+      "default": "normal"
+    }
   ]
 }

@@ -1,11 +1,14 @@
 # Stackfall
 
-Educational tower stacker. Pick a subject, topic, difficulty and time limit, then build the tallest tower you can before the clock runs out.
+Educational tower stacker. Pick a subject, topic, difficulty and clock, then build the tallest tower you can before the clock hits zero.
 
 - Right answer: a floor drops onto the tower (+1)
 - Wrong answer: the top 3 floors are knocked off
 - Every 5 right answers in a row: a bonus gold floor (+2 in total)
-- Record: the tower's height when time runs out, kept per topic, difficulty and time limit
+- Clock (chess-clock style): you start with a few seconds; a right answer adds time, a wrong one takes it away. The clock only runs while a question is up.
+  - Quick: start 10 s, +2 s / −2 s · Normal: start 15 s, +2 s / −2 s · Relaxed: start 20 s, +3 s / −2 s
+  - The bonus shrinks by 0.5 s every 8 right answers (never below 0.5 s) and the clock tops out at start + 5 s, so every run ends
+- Record: the tower's height when the clock hits zero, kept per topic, difficulty and clock
 
 Same family as [Lanefall](https://github.com/aosmann/lanefall): the same minimal dark-glass interface, type and ember accent, no build step, works offline and installs to the iPhone home screen. The scene is the app icon's world: a dusk sky that deepens to night as the tower climbs, plain warm slabs, and the next floor swinging from a crane. Height is shown in metres against real landmarks (3 m per floor).
 
