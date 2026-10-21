@@ -362,6 +362,7 @@ function regionPicker(topic,opts){opts=opts||{};if(!topic||!topic.regions)return
 .eq-reg button{font:inherit;font-size:14px;font-weight:700;line-height:1;border-radius:999px;padding:9px 13px;cursor:pointer;
   color:var(--eq-fg);background:var(--eq-bg);border:1.5px solid var(--eq-line)}
 .eq-reg button[aria-pressed=true]{background:var(--eq-on-bg);border-color:var(--eq-on-bg);color:var(--eq-on-fg)}
+.eq-reg button[aria-pressed=true]::before{content:'✓';margin-right:6px;font-weight:900}
 .eq-reg button:focus-visible{outline:2px solid var(--eq-on-bg);outline-offset:2px}`;document.head.append(st)}
   const box=document.createElement('div');box.className='eq-reg';box.setAttribute('role','group');box.setAttribute('aria-label','Continents');
   const paint=()=>{const cur=getRegions(topic.id),all=cur.length===REGION_IDS.length;box.innerHTML='';
@@ -372,8 +373,12 @@ function regionPicker(topic,opts){opts=opts||{};if(!topic||!topic.regions)return
     box.append(mk('all','All',all));REGIONS.forEach(r=>box.append(mk(r.id,r.name,!all&&cur.includes(r.id))))};
   /* colours from the menu's own text colour, so chips read on light cards and dark scenes alike;
      a game can still set --eq-bg, --eq-fg, --eq-line, --eq-on-bg, --eq-on-fg itself */
-  const tone=()=>{if(!box.isConnected)return requestAnimationFrame(tone);const cs=getComputedStyle(box),m=(cs.color.match(/[\d.]+/g)||[0,0,0]).map(Number);
-    const light=(.2126*m[0]+.7152*m[1]+.0722*m[2])/255>.6,set=(k,v)=>{if(!cs.getPropertyValue(k).trim())box.style.setProperty(k,v)};
+  /* the chips' colours follow the background they actually sit on (nearest opaque ancestor) */
+  const tone=()=>{if(!box.isConnected)return requestAnimationFrame(tone);const cs=getComputedStyle(box),set=(k,v)=>{if(!cs.getPropertyValue(k).trim())box.style.setProperty(k,v)};
+    let n=box.parentElement,rgb=[255,255,255];
+    while(n){const c=(getComputedStyle(n).backgroundColor.match(/[\d.]+/g)||[]).map(Number);if(c.length>=3&&(c.length<4||c[3]>.5)){rgb=c;break}n=n.parentElement}
+    if(!n){const c=(getComputedStyle(document.body).backgroundColor.match(/[\d.]+/g)||[]).map(Number);if(c.length>=3&&(c.length<4||c[3]>0))rgb=c}
+    const light=(.2126*rgb[0]+.7152*rgb[1]+.0722*rgb[2])/255<.5; // a dark background behind the chips
     if(light){set('--eq-fg','#fff');set('--eq-bg','rgba(14,16,26,.72)');set('--eq-line','rgba(255,255,255,.28)');set('--eq-on-bg','#fff');set('--eq-on-fg','#14161f')}
     else{set('--eq-fg','#1d2033');set('--eq-bg','#fff');set('--eq-line','rgba(20,22,40,.16)');set('--eq-on-bg','#1d2033');set('--eq-on-fg','#fff')}};
   paint();tone();return box}
