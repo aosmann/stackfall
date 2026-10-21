@@ -1,7 +1,9 @@
-/* EduQ v2 — shared question bank for the educational games portal (Lanefall, Stackfall, Slicefall, …).
+/* EduQ v3 — shared question bank for the educational games portal (Lanefall, Stackfall, Slicefall, …).
    Extracted from Lanefall v10. v2: no repeats inside a run (a level that runs dry borrows from the topic's other
    levels; only when the whole topic is used up does next() repeat, flagged with Q.repeat and next.exhausted),
-   and much bigger banks for the fixed-list topics. Every generator returns {q, c, w:[2 wrong], img?, code?, tag?}.
+   and much bigger banks for the fixed-list topics.
+   v3: Geography is Capitals + Guess the flag for all 195 countries, filtered by continent
+   (EduQ.stream(topic, level, {regions:['eu','as']}); the choice is remembered per topic, EduQ.regionPicker draws the chips). Every generator returns {q, c, w:[2 wrong], img?, code?, tag?}.
    Usage: EduQ.setLevel(1|2|3); const Q = topic.gen();  */
 (function(){
 let LEVEL=1;const LV=()=>LEVEL;
@@ -168,114 +170,37 @@ const order=()=>{const L=LV(),a=ri_(2,[9,9,20][L-1]),b=ri_(2,[4,6,9][L-1]),d=ri_
   if(Math.random()<.5){const c=a+b*d,wrong=(a+b)*d;const o={q:`${a} + ${b} × ${d} = ?`,c:String(c),w:[]};o.w=[String(wrong===c?c+1:wrong),String(c+d)];if(o.w[1]===o.w[0])o.w[1]=String(c-1);return o}
   const c=(a+b)*d;return{q:`(${a} + ${b}) × ${d} = ?`,c:String(c),w:[String(a+b*d),String(c+d)]}};
 
-/* ---- Geography ---- */
-const EURO_CAPS={1:[["France","Paris","Marseille"],["Germany","Berlin","Munich"],["Italy","Rome","Milan"],["Spain","Madrid","Barcelona"],["United Kingdom","London","Manchester"],
-  ["Romania","Bucharest","Cluj-Napoca"],["Greece","Athens","Thessaloniki"],["Portugal","Lisbon","Porto"],["Netherlands","Amsterdam","Rotterdam"],["Russia","Moscow","Saint Petersburg"],["Sweden","Stockholm","Gothenburg"],["Austria","Vienna","Salzburg"],["Poland","Warsaw","Kraków"]],
- 2:[["Austria","Vienna","Salzburg"],["Hungary","Budapest"],["Poland","Warsaw","Kraków"],["Belgium","Brussels","Antwerp"],["Sweden","Stockholm"],["Norway","Oslo"],
-  ["Denmark","Copenhagen"],["Ireland","Dublin","Cork"],["Czechia","Prague"],["Finland","Helsinki"],["Switzerland","Bern","Zurich"],["Ukraine","Kyiv","Odesa"]],
- 3:[["Bulgaria","Sofia"],["Serbia","Belgrade"],["Croatia","Zagreb","Split"],["Moldova","Chișinău"],["Slovakia","Bratislava"],["Slovenia","Ljubljana"],["Estonia","Tallinn"],
-  ["Latvia","Riga"],["Lithuania","Vilnius","Kaunas"],["Iceland","Reykjavík"],["Albania","Tirana"],["North Macedonia","Skopje"],["Montenegro","Podgorica"],["Malta","Valletta"],
-  ["Bosnia and Herzegovina","Sarajevo"],["Belarus","Minsk"],["Cyprus","Nicosia"],["Liechtenstein","Vaduz"],["Andorra","Andorra la Vella"]]};
-/* capitals are asked both ways: "Capital of France" and "Paris is the capital of…" */
-const capsBoth=b=>{const fw=pairedL(b,k=>`Capital of ${k}`),bw=byLv(b,list=>{const caps=list.map(p=>p[1]),ctry=list.map(p=>p[0]),d=deck(list);
-  return()=>{const [c,k]=d();return{q:`${k} is the capital of…`,c,w:pickN(ctry,2,c)}}});return()=>Math.random()<.5?fw():bw()};
-const euroCaps=capsBoth(EURO_CAPS);
-const WORLD_CAPS={1:[["Japan","Tokyo","Osaka"],["China","Beijing","Shanghai"],["United States","Washington","New York"],["Canada","Ottawa","Toronto"],["Egypt","Cairo","Alexandria"],
-  ["Mexico","Mexico City","Cancún"],["Argentina","Buenos Aires"],["South Korea","Seoul","Busan"],["Thailand","Bangkok","Phuket"],["India","New Delhi","Mumbai"],["Cuba","Havana"],["Iraq","Baghdad","Basra"],["Jamaica","Kingston","Montego Bay"]],
- 2:[["Australia","Canberra","Sydney"],["Brazil","Brasília","Rio de Janeiro"],["Turkey","Ankara","Istanbul"],["Kenya","Nairobi","Mombasa"],["Peru","Lima"],["Chile","Santiago"],
-  ["Vietnam","Hanoi","Ho Chi Minh City"],["Saudi Arabia","Riyadh","Jeddah"],["Morocco","Rabat","Casablanca"],["New Zealand","Wellington","Auckland"],["Venezuela","Caracas"],["Afghanistan","Kabul"],["Algeria","Algiers","Oran"],["Uruguay","Montevideo"],["Nepal","Kathmandu"],["Bangladesh","Dhaka","Chittagong"],
-  ["Ecuador","Quito","Guayaquil"],["Paraguay","Asunción"],["Syria","Damascus","Aleppo"],["Jordan","Amman"],["Lebanon","Beirut"],["Qatar","Doha"],["Tunisia","Tunis"],["Libya","Tripoli"],
-  ["North Korea","Pyongyang"],["Cambodia","Phnom Penh"],["Zimbabwe","Harare"],["Uganda","Kampala"],["Angola","Luanda"],["Costa Rica","San José"]],
- 3:[["Nigeria","Abuja","Lagos"],["Pakistan","Islamabad","Karachi"],["Kazakhstan","Astana","Almaty"],["Myanmar","Naypyidaw","Yangon"],["Tanzania","Dodoma","Dar es Salaam"],
-  ["Ivory Coast","Yamoussoukro","Abidjan"],["Mongolia","Ulaanbaatar"],["Ethiopia","Addis Ababa"],["Ghana","Accra"],["Colombia","Bogotá","Medellín"],["Philippines","Manila"],
-  ["Iran","Tehran"],["Malaysia","Kuala Lumpur"],["Bhutan","Thimphu"],["Laos","Vientiane"],["Uzbekistan","Tashkent","Samarkand"],["Senegal","Dakar"],["Sudan","Khartoum"],
-  ["Rwanda","Kigali"],["Madagascar","Antananarivo"],["Mozambique","Maputo"],["Zambia","Lusaka"],["Namibia","Windhoek"],["Botswana","Gaborone"],["Mali","Bamako"],["Niger","Niamey"],
-  ["Cameroon","Yaoundé","Douala"],["Kyrgyzstan","Bishkek"],["Tajikistan","Dushanbe"],["Azerbaijan","Baku"],["Georgia","Tbilisi"],["Armenia","Yerevan"],["Oman","Muscat"],
-  ["Honduras","Tegucigalpa"],["Nicaragua","Managua"],["Fiji","Suva"],["Papua New Guinea","Port Moresby"]]};
-const worldCaps=capsBoth(WORLD_CAPS);
-const FLAGS=[
- ["Germany",{t:'h',c:['#000','#DD0000','#FFCE00']}],["Netherlands",{t:'h',c:['#AE1C28','#fff','#21468B']}],["Russia",{t:'h',c:['#fff','#0039A6','#D52B1E']}],
- ["Austria",{t:'h',c:['#ED2939','#fff','#ED2939']}],["Hungary",{t:'h',c:['#CE2939','#fff','#477050']}],["Bulgaria",{t:'h',c:['#fff','#00966E','#D62612']}],
- ["Estonia",{t:'h',c:['#0072CE','#000','#fff']}],["Lithuania",{t:'h',c:['#FDB913','#006A44','#C1272D']}],["Poland",{t:'h',c:['#fff','#DC143C']}],
- ["Ukraine",{t:'h',c:['#0057B7','#FFD700']}],["Indonesia",{t:'h',c:['#CE1126','#fff']}],["Colombia",{t:'h',c:['#FCD116','#FCD116','#003893','#CE1126']}],
- ["Latvia",{t:'h',c:['#9E3039','#9E3039','#fff','#9E3039','#9E3039']}],["Thailand",{t:'h',c:['#A51931','#F4F5F8','#2D2A4A','#2D2A4A','#F4F5F8','#A51931']}],
- ["France",{t:'v',c:['#002395','#fff','#ED2939']}],["Italy",{t:'v',c:['#009246','#fff','#CE2B37']}],["Romania",{t:'v',c:['#002B7F','#FCD116','#CE1126']}],
- ["Belgium",{t:'v',c:['#000','#FDDA24','#EF3340']}],["Ireland",{t:'v',c:['#169B62','#fff','#FF883E']}],["Nigeria",{t:'v',c:['#008751','#fff','#008751']}],
- ["Mali",{t:'v',c:['#14B53A','#FCD116','#CE1126']}],["Peru",{t:'v',c:['#D91023','#fff','#D91023']}],["Guinea",{t:'v',c:['#CE1126','#FCD116','#009460']}],
- ["Ivory Coast",{t:'v',c:['#F77F00','#fff','#009E60']}],["Chad",{t:'v',c:['#002664','#FECB00','#C60C30']}],
- ["Vietnam",{t:'h',c:['#DA251D'],star:{c:'#FFFF00',r:.3}}],["Somalia",{t:'h',c:['#4189DD'],star:{c:'#FFFFFF',r:.28}}],["Morocco",{t:'h',c:['#C1272D'],star:{c:'#006233',r:.28}}],
- ["Senegal",{t:'v',c:['#00853F','#FDEF42','#E31B23'],star:{c:'#00853F',r:.16}}],["Cameroon",{t:'v',c:['#007A5E','#CE1126','#FCD116'],star:{c:'#FCD116',r:.16}}],
- ["Gabon",{t:'h',c:['#009E60','#FCD116','#3A75C4']}],["Sierra Leone",{t:'h',c:['#1EB53A','#FFFFFF','#0072C6']}],["Yemen",{t:'h',c:['#CE1126','#FFFFFF','#000000']}],
- ["Armenia",{t:'h',c:['#D90012','#0033A0','#F2A800']}],["Luxembourg",{t:'h',c:['#EF3340','#FFFFFF','#00A3E0']}],["Mauritius",{t:'h',c:['#EA2839','#1A206D','#FFD500','#00A551']}],
- ["Bolivia",{t:'h',c:['#D52B1E','#F9E300','#007934']}],["Palau",{t:'o',bg:'#4AADD6',dot:'#FFDE00',cx:.45,r:.3}],
- ["Sweden",{t:'n',bg:'#006AA7',x:'#FECC00'}],["Finland",{t:'n',bg:'#fff',x:'#002F6C'}],["Denmark",{t:'n',bg:'#C8102E',x:'#fff'}],
- ["Norway",{t:'n',bg:'#BA0C2F',x:'#fff',in:'#00205B'}],["Iceland",{t:'n',bg:'#02529C',x:'#fff',in:'#DC1E35'}],
- ["Japan",{t:'o',bg:'#fff',dot:'#BC002D',cx:.5,r:.3}],["Bangladesh",{t:'o',bg:'#006A4E',dot:'#F42A41',cx:.45,r:.3}],
- ["Switzerland",{t:'ch'}],["Czechia",{t:'cz'}],["Greece",{t:'gr'}],
- ["United States",{t:'us'}],["United Kingdom",{t:'uk'}],["China",{t:'cn'}],["Turkey",{t:'tr'}],["Brazil",{t:'br'}],["Jamaica",{t:'jm'}],
- ["India",{t:'h',c:['#FF9933','#fff','#138808'],wheel:'#000080'}],["Spain",{t:'h',c:['#AA151B','#F1BF00','#F1BF00','#AA151B']}],
- ["Argentina",{t:'h',c:['#74ACDF','#fff','#74ACDF'],dot:{c:'#F6B40E',r:.12}}],["Costa Rica",{t:'h',c:['#002B7F','#fff','#CE1126','#CE1126','#fff','#002B7F']}],
- ["Laos",{t:'h',c:['#CE1126','#002868','#002868','#CE1126'],dot:{c:'#fff',r:.2}}],["Ghana",{t:'h',c:['#CE1126','#FCD116','#006B3F'],star:{c:'#000',r:.17}}],
- ["Burkina Faso",{t:'h',c:['#EF2B2D','#009E49'],star:{c:'#FCD116',r:.18}}],["Myanmar",{t:'h',c:['#FECB00','#34B233','#EA2839'],star:{c:'#fff',r:.36}}],
- ["Cuba",{t:'h',c:['#002A8F','#fff','#002A8F','#fff','#002A8F'],tri:{c:'#CF142B',w:.43},star:{c:'#fff',r:.11,cx:.145}}],
- ["Sudan",{t:'h',c:['#D21034','#fff','#000'],tri:{c:'#007229',w:.33}}],["Bahamas",{t:'h',c:['#00778B','#FFC72C','#00778B'],tri:{c:'#000',w:.42}}],
- ["Benin",{t:'side',l:'#008751',lw:.4,c:['#FCD116','#E8112D']}],["Madagascar",{t:'side',l:'#fff',lw:.33,c:['#FC3D32','#007E3A']}],
- ["United Arab Emirates",{t:'side',l:'#FF0000',lw:.25,c:['#00732F','#fff','#000']}]];
-/* a five-pointed star; rot turns it (default: one point straight up) */
-function star5(x,cx,cy,r,rot){x.beginPath();for(let k=0;k<10;k++){const a=(rot==null?-Math.PI/2:rot)+k*Math.PI/5,rr=k%2?r*.4:r;x.lineTo(cx+Math.cos(a)*rr,cy+Math.sin(a)*rr)}x.closePath();x.fill()}
-function flagURL(f){
-  const W=192,H=128,c=document.createElement('canvas');c.width=W;c.height=H;const x=c.getContext('2d');
-  if(f.t==='h'){const n=f.c.length;f.c.forEach((col,i)=>{x.fillStyle=col;x.fillRect(0,i*H/n,W,H/n+1)})}
-  else if(f.t==='v'){const n=f.c.length;f.c.forEach((col,i)=>{x.fillStyle=col;x.fillRect(i*W/n,0,W/n+1,H)})}
-  else if(f.t==='n'){x.fillStyle=f.bg;x.fillRect(0,0,W,H);const cx=W*.375,t=H*(f.in?.25:.2);
-    x.fillStyle=f.x;x.fillRect(cx-t/2,0,t,H);x.fillRect(0,H/2-t/2,W,t);
-    if(f.in){const u=H*.125;x.fillStyle=f.in;x.fillRect(cx-u/2,0,u,H);x.fillRect(0,H/2-u/2,W,u)}}
-  else if(f.t==='o'){x.fillStyle=f.bg;x.fillRect(0,0,W,H);x.fillStyle=f.dot;x.beginPath();x.arc(W*f.cx,H/2,H*f.r,0,7);x.fill()}
-  else if(f.t==='ch'){const s=H,o=(W-s)/2;x.fillStyle='#DA291C';x.fillRect(o,0,s,s);x.fillStyle='#fff';
-    const a=s*.19,l=s*.62;x.fillRect(o+s/2-a/2,s/2-l/2,a,l);x.fillRect(o+s/2-l/2,s/2-a/2,l,a)}
-  else if(f.t==='cz'){x.fillStyle='#fff';x.fillRect(0,0,W,H/2);x.fillStyle='#D7141A';x.fillRect(0,H/2,W,H/2);
-    x.fillStyle='#11457E';x.beginPath();x.moveTo(0,0);x.lineTo(W/2,H/2);x.lineTo(0,H);x.fill()}
-  else if(f.t==='side'){x.fillStyle=f.l;x.fillRect(0,0,W*f.lw,H);const n=f.c.length;f.c.forEach((col,i)=>{x.fillStyle=col;x.fillRect(W*f.lw,i*H/n,W*(1-f.lw)+1,H/n+1)})}
-  else if(f.t==='us'){const s=H/13;for(let i=0;i<13;i++){x.fillStyle=i%2?'#fff':'#B22234';x.fillRect(0,i*s,W,s+1)}
-    const cw=W*.4,ch=s*7;x.fillStyle='#3C3B6E';x.fillRect(0,0,cw,ch);x.fillStyle='#fff';
-    for(let r=0;r<9;r++)for(let c=0;c<(r%2?5:6);c++)star5(x,cw*((r%2?2:1)+c*2)/12,ch*(r+1)/10,s*.32)}
-  else if(f.t==='uk'){x.fillStyle='#012169';x.fillRect(0,0,W,H);x.lineCap='butt';
-    x.strokeStyle='#fff';x.lineWidth=H*.2;x.beginPath();x.moveTo(0,0);x.lineTo(W,H);x.moveTo(W,0);x.lineTo(0,H);x.stroke();
-    x.strokeStyle='#C8102E';x.lineWidth=H*.067;x.beginPath();x.moveTo(0,0);x.lineTo(W,H);x.moveTo(W,0);x.lineTo(0,H);x.stroke();
-    x.fillStyle='#fff';x.fillRect(W/2-H/6,0,H/3,H);x.fillRect(0,H/2-H/6,W,H/3);x.fillStyle='#C8102E';x.fillRect(W/2-H/10,0,H/5,H);x.fillRect(0,H/2-H/10,W,H/5)}
-  else if(f.t==='cn'){x.fillStyle='#EE1C25';x.fillRect(0,0,W,H);x.fillStyle='#FFFF00';star5(x,W*.167,H*.25,H*.15);
-    [[.333,.1],[.4,.2],[.4,.35],[.333,.45]].forEach(([a,b])=>star5(x,W*a,H*b,H*.05,Math.atan2(H*.25-H*b,W*.167-W*a)))}
-  else if(f.t==='tr'){x.fillStyle='#E30A17';x.fillRect(0,0,W,H);x.fillStyle='#fff';x.beginPath();x.arc(H*.5,H/2,H*.25,0,7);x.fill();
-    x.fillStyle='#E30A17';x.beginPath();x.arc(H*.5625,H/2,H*.2,0,7);x.fill();x.fillStyle='#fff';star5(x,H*.855,H/2,H*.125,Math.PI)}
-  else if(f.t==='br'){x.fillStyle='#009C3B';x.fillRect(0,0,W,H);x.fillStyle='#FFDF00';x.beginPath();x.moveTo(W*.085,H/2);x.lineTo(W/2,H*.11);x.lineTo(W*.915,H/2);x.lineTo(W/2,H*.89);x.closePath();x.fill();
-    x.fillStyle='#002776';x.beginPath();x.arc(W/2,H/2,H*.22,0,7);x.fill();x.save();x.beginPath();x.arc(W/2,H/2,H*.22,0,7);x.clip();
-    x.strokeStyle='#fff';x.lineWidth=H*.04;x.beginPath();x.arc(W*.42,H*1.05,H*.6,-Math.PI*.62,-Math.PI*.18);x.stroke();x.restore()}
-  else if(f.t==='jm'){x.fillStyle='#009B3A';x.fillRect(0,0,W,H);x.fillStyle='#000';x.beginPath();x.moveTo(0,0);x.lineTo(W/2,H/2);x.lineTo(0,H);x.fill();
-    x.beginPath();x.moveTo(W,0);x.lineTo(W/2,H/2);x.lineTo(W,H);x.fill();x.strokeStyle='#FED100';x.lineWidth=H*.14;x.beginPath();x.moveTo(0,0);x.lineTo(W,H);x.moveTo(W,0);x.lineTo(0,H);x.stroke()}
-  else if(f.t==='gr'){const s=H/9;for(let i=0;i<9;i++){x.fillStyle=i%2?'#fff':'#0D5EAF';x.fillRect(0,i*s,W,s+1)}
-    x.fillStyle='#0D5EAF';x.fillRect(0,0,5*s,5*s);x.fillStyle='#fff';x.fillRect(2*s,0,s,5*s);x.fillRect(0,2*s,5*s,s)}
-  if(f.tri){x.fillStyle=f.tri.c;x.beginPath();x.moveTo(0,0);x.lineTo(W*f.tri.w,H/2);x.lineTo(0,H);x.closePath();x.fill()}
-  if(f.dot){x.fillStyle=f.dot.c;x.beginPath();x.arc(W*(f.dot.cx||.5),H/2,H*f.dot.r,0,7);x.fill()}
-  if(f.wheel){x.strokeStyle=f.wheel;x.lineWidth=2.4;x.beginPath();x.arc(W/2,H/2,H*.135,0,7);x.stroke();x.lineWidth=1;x.beginPath();
-    for(let k=0;k<24;k++){const a=k*Math.PI/12;x.moveTo(W/2,H/2);x.lineTo(W/2+Math.cos(a)*H*.135,H/2+Math.sin(a)*H*.135)}x.stroke()}
-  if(f.star){x.fillStyle=f.star.c;star5(x,W*(f.star.cx||.5),H/2,H*f.star.r)}
-  if(f.t!=='ch'){x.strokeStyle='rgba(0,0,0,.25)';x.lineWidth=2;x.strokeRect(1,1,W-2,H-2)}
-  return c.toDataURL();
-}
-const FLAG_LV={1:['Japan','France','Italy','Germany','Switzerland','Sweden','Greece','Ukraine','Romania','Poland','Vietnam',
-   'United States','United Kingdom','China','Turkey','Brazil','India','Spain','Argentina','Jamaica'],
- 2:['Netherlands','Russia','Austria','Hungary','Bulgaria','Ireland','Belgium','Denmark','Norway','Finland','Czechia','Nigeria','Senegal','Cameroon','Morocco','Armenia',
-   'Cuba','Ghana','Costa Rica','Bahamas','United Arab Emirates'],
- 3:['Estonia','Lithuania','Latvia','Colombia','Thailand','Indonesia','Mali','Peru','Guinea','Ivory Coast','Iceland','Bangladesh','Chad','Gabon','Sierra Leone','Yemen','Mauritius','Palau','Somalia','Bolivia','Luxembourg',
-   'Myanmar','Burkina Faso','Laos','Sudan','Benin','Madagascar']};
-const FLAG_TRAP={Senegal:'Mali',Cameroon:'Guinea',Morocco:'Vietnam',Vietnam:'Morocco',Somalia:'Vietnam',Gabon:'Sierra Leone','Sierra Leone':'Gabon',Luxembourg:'Netherlands',Bolivia:'Lithuania',Palau:'Bangladesh',Armenia:'Colombia',Romania:'Chad',Chad:'Romania',Ireland:'Ivory Coast','Ivory Coast':'Ireland',Mali:'Guinea',Guinea:'Mali',Indonesia:'Poland',Poland:'Indonesia',
- Netherlands:'Russia',Russia:'Netherlands',Italy:'Ireland',Norway:'Iceland',Iceland:'Norway',Sweden:'Finland',Lithuania:'Bolivia',Latvia:'Austria',Austria:'Latvia',Peru:'Austria',Colombia:'Ecuador',Bangladesh:'Japan',Japan:'Bangladesh',
- China:'Vietnam','Burkina Faso':'Vietnam',Ghana:'Bolivia',Myanmar:'Ghana',Laos:'Costa Rica','Costa Rica':'Thailand',Thailand:'Costa Rica',Cuba:'Bahamas',Bahamas:'Cuba',
- Benin:'Madagascar',Madagascar:'Benin','United Arab Emirates':'Sudan',Sudan:'United Arab Emirates',India:'Ireland',Spain:'Colombia',Argentina:'Somalia'};
-/* flag pictures are drawn once and reused, so the same flag always has the same picture */
-const FLAG_IMG={};const flagImg=n=>FLAG_IMG[n]||(FLAG_IMG[n]=flagURL(FLAGS.find(x=>x[0]===n)[1]));
-const flags=byLv(FLAG_LV,(names,l)=>{const d=deck(names),pool=FLAGS.map(f=>f[0]);return()=>{const n=d();
-  const t=l>1&&pool.includes(FLAG_TRAP[n])?FLAG_TRAP[n]:null;return{q:'Which country is this?',c:n,w:pickN(pool,2,n,t),img:flagImg(n),tag:'flag'}}});
+/* ---- Geography ----
+   Every UN member state plus the two observer states (195). Data: mledoze/countries
+   (Open Database License, https://github.com/mledoze/countries). Flags: flag-icons (MIT,
+   https://github.com/lipis/flag-icons), compressed into flags/<iso>.webp next to this file.
+   Row: [country, capital ("" = not asked: several or disputed capitals, or a city-state),
+   continent (eu|as|af|am|oc), ISO code, tier (1 well known, 2, 3), trap city or ""].
+   Continents picked → only countries there; the tier follows the level, so Easy starts with
+   the well-known ones and the stream moves to harder tiers before anything repeats. */
+const COUNTRIES=[["Afghanistan","Kabul","as","af",2,""],["Albania","Tirana","eu","al",3,""],["Algeria","Algiers","af","dz",2,"Oran"],["Andorra","Andorra la Vella","eu","ad",3,""],["Angola","Luanda","af","ao",2,""],["Antigua and Barbuda","St. John's","am","ag",3,""],["Argentina","Buenos Aires","am","ar",1,""],["Armenia","Yerevan","as","am",2,""],["Australia","Canberra","oc","au",1,"Sydney"],["Austria","Vienna","eu","at",1,"Salzburg"],["Azerbaijan","Baku","as","az",3,""],["Bahamas","Nassau","am","bs",2,""],["Bahrain","Manama","as","bh",3,""],["Bangladesh","Dhaka","as","bd",2,"Chittagong"],["Barbados","Bridgetown","am","bb",3,""],["Belarus","Minsk","eu","by",3,""],["Belgium","Brussels","eu","be",2,"Antwerp"],["Belize","Belmopan","am","bz",3,""],["Benin","Porto-Novo","af","bj",3,""],["Bhutan","Thimphu","as","bt",3,""],["Bolivia","","am","bo",3,""],["Bosnia and Herzegovina","Sarajevo","eu","ba",3,""],["Botswana","Gaborone","af","bw",3,""],["Brazil","Brasília","am","br",1,"Rio de Janeiro"],["Brunei","Bandar Seri Begawan","as","bn",3,""],["Bulgaria","Sofia","eu","bg",2,""],["Burkina Faso","Ouagadougou","af","bf",3,""],["Burundi","Gitega","af","bi",3,""],["Cambodia","Phnom Penh","as","kh",2,""],["Cameroon","Yaoundé","af","cm",2,"Douala"],["Canada","Ottawa","am","ca",1,"Toronto"],["Cape Verde","Praia","af","cv",3,""],["Central African Republic","Bangui","af","cf",3,""],["Chad","N'Djamena","af","td",3,""],["Chile","Santiago","am","cl",2,""],["China","Beijing","as","cn",1,"Shanghai"],["Colombia","Bogotá","am","co",3,"Medellín"],["Comoros","Moroni","af","km",3,""],["Costa Rica","San José","am","cr",2,""],["Croatia","Zagreb","eu","hr",3,"Split"],["Cuba","Havana","am","cu",1,""],["Cyprus","Nicosia","eu","cy",3,""],["Czechia","Prague","eu","cz",2,""],["Denmark","Copenhagen","eu","dk",2,""],["Djibouti","Djibouti","af","dj",3,""],["Dominica","Roseau","am","dm",3,""],["Dominican Republic","Santo Domingo","am","do",3,""],["DR Congo","Kinshasa","af","cd",3,""],["Ecuador","Quito","am","ec",2,"Guayaquil"],["Egypt","Cairo","af","eg",1,"Alexandria"],["El Salvador","San Salvador","am","sv",3,""],["Equatorial Guinea","Malabo","af","gq",3,""],["Eritrea","Asmara","af","er",3,""],["Estonia","Tallinn","eu","ee",3,""],["Eswatini","","af","sz",3,""],["Ethiopia","Addis Ababa","af","et",3,""],["Fiji","Suva","oc","fj",3,""],["Finland","Helsinki","eu","fi",2,""],["France","Paris","eu","fr",1,"Marseille"],["Gabon","Libreville","af","ga",3,""],["Gambia","Banjul","af","gm",3,""],["Georgia","Tbilisi","as","ge",3,""],["Germany","Berlin","eu","de",1,"Munich"],["Ghana","Accra","af","gh",2,""],["Greece","Athens","eu","gr",1,"Thessaloniki"],["Grenada","St. George's","am","gd",3,""],["Guatemala","Guatemala City","am","gt",3,""],["Guinea","Conakry","af","gn",3,""],["Guinea-Bissau","Bissau","af","gw",3,""],["Guyana","Georgetown","am","gy",3,""],["Haiti","Port-au-Prince","am","ht",3,""],["Honduras","Tegucigalpa","am","hn",3,""],["Hungary","Budapest","eu","hu",2,""],["Iceland","Reykjavík","eu","is",3,""],["India","New Delhi","as","in",1,"Mumbai"],["Indonesia","Jakarta","as","id",3,""],["Iran","Tehran","as","ir",3,""],["Iraq","Baghdad","as","iq",1,"Basra"],["Ireland","Dublin","eu","ie",2,"Cork"],["Israel","","as","il",3,""],["Italy","Rome","eu","it",1,"Milan"],["Ivory Coast","Yamoussoukro","af","ci",3,"Abidjan"],["Jamaica","Kingston","am","jm",1,"Montego Bay"],["Japan","Tokyo","as","jp",1,"Osaka"],["Jordan","Amman","as","jo",2,""],["Kazakhstan","Astana","as","kz",3,"Almaty"],["Kenya","Nairobi","af","ke",1,"Mombasa"],["Kiribati","South Tarawa","oc","ki",3,""],["Kuwait","Kuwait City","as","kw",3,""],["Kyrgyzstan","Bishkek","as","kg",3,""],["Laos","Vientiane","as","la",3,""],["Latvia","Riga","eu","lv",3,""],["Lebanon","Beirut","as","lb",2,""],["Lesotho","Maseru","af","ls",3,""],["Liberia","Monrovia","af","lr",3,""],["Libya","Tripoli","af","ly",2,""],["Liechtenstein","Vaduz","eu","li",3,""],["Lithuania","Vilnius","eu","lt",3,"Kaunas"],["Luxembourg","Luxembourg","eu","lu",3,""],["Madagascar","Antananarivo","af","mg",3,""],["Malawi","Lilongwe","af","mw",3,""],["Malaysia","Kuala Lumpur","as","my",3,""],["Maldives","Malé","as","mv",3,""],["Mali","Bamako","af","ml",3,""],["Malta","Valletta","eu","mt",3,""],["Marshall Islands","Majuro","oc","mh",3,""],["Mauritania","Nouakchott","af","mr",3,""],["Mauritius","Port Louis","af","mu",3,""],["Mexico","Mexico City","am","mx",1,"Cancún"],["Micronesia","Palikir","oc","fm",3,""],["Moldova","Chișinău","eu","md",3,""],["Monaco","","eu","mc",3,""],["Mongolia","Ulaanbaatar","as","mn",3,""],["Montenegro","Podgorica","eu","me",3,""],["Morocco","Rabat","af","ma",1,"Casablanca"],["Mozambique","Maputo","af","mz",3,""],["Myanmar","Naypyidaw","as","mm",3,"Yangon"],["Namibia","Windhoek","af","na",3,""],["Nauru","","oc","nr",3,""],["Nepal","Kathmandu","as","np",2,""],["Netherlands","Amsterdam","eu","nl",1,"Rotterdam"],["New Zealand","Wellington","oc","nz",2,"Auckland"],["Nicaragua","Managua","am","ni",3,""],["Niger","Niamey","af","ne",3,""],["Nigeria","Abuja","af","ng",2,"Lagos"],["North Korea","Pyongyang","as","kp",2,""],["North Macedonia","Skopje","eu","mk",3,""],["Norway","Oslo","eu","no",2,""],["Oman","Muscat","as","om",3,""],["Pakistan","Islamabad","as","pk",3,"Karachi"],["Palau","Ngerulmud","oc","pw",3,""],["Palestine","","as","ps",3,""],["Panama","Panama City","am","pa",3,""],["Papua New Guinea","Port Moresby","oc","pg",3,""],["Paraguay","Asunción","am","py",2,""],["Peru","Lima","am","pe",2,""],["Philippines","Manila","as","ph",3,""],["Poland","Warsaw","eu","pl",1,"Kraków"],["Portugal","Lisbon","eu","pt",1,"Porto"],["Qatar","Doha","as","qa",2,""],["Republic of the Congo","Brazzaville","af","cg",3,""],["Romania","Bucharest","eu","ro",1,"Cluj-Napoca"],["Russia","Moscow","eu","ru",1,"Saint Petersburg"],["Rwanda","Kigali","af","rw",3,""],["Saint Kitts and Nevis","Basseterre","am","kn",3,""],["Saint Lucia","Castries","am","lc",3,""],["Saint Vincent and the Grenadines","Kingstown","am","vc",3,""],["Samoa","Apia","oc","ws",3,""],["San Marino","","eu","sm",3,""],["São Tomé and Príncipe","São Tomé","af","st",3,""],["Saudi Arabia","Riyadh","as","sa",2,"Jeddah"],["Senegal","Dakar","af","sn",2,""],["Serbia","Belgrade","eu","rs",3,""],["Seychelles","Victoria","af","sc",3,""],["Sierra Leone","Freetown","af","sl",3,""],["Singapore","","as","sg",3,""],["Slovakia","Bratislava","eu","sk",3,""],["Slovenia","Ljubljana","eu","si",3,""],["Solomon Islands","Honiara","oc","sb",3,""],["Somalia","Mogadishu","af","so",3,""],["South Africa","","af","za",1,""],["South Korea","Seoul","as","kr",1,"Busan"],["South Sudan","Juba","af","ss",3,""],["Spain","Madrid","eu","es",1,"Barcelona"],["Sri Lanka","","as","lk",3,""],["Sudan","Khartoum","af","sd",3,""],["Suriname","Paramaribo","am","sr",3,""],["Sweden","Stockholm","eu","se",1,"Gothenburg"],["Switzerland","Bern","eu","ch",1,"Zurich"],["Syria","Damascus","as","sy",2,"Aleppo"],["Tajikistan","Dushanbe","as","tj",3,""],["Tanzania","Dodoma","af","tz",3,"Dar es Salaam"],["Thailand","Bangkok","as","th",1,"Phuket"],["Timor-Leste","Dili","as","tl",3,""],["Togo","Lomé","af","tg",3,""],["Tonga","Nuku'alofa","oc","to",3,""],["Trinidad and Tobago","Port of Spain","am","tt",3,""],["Tunisia","Tunis","af","tn",2,""],["Turkey","Ankara","as","tr",1,"Istanbul"],["Turkmenistan","Ashgabat","as","tm",3,""],["Tuvalu","Funafuti","oc","tv",3,""],["Uganda","Kampala","af","ug",2,""],["Ukraine","Kyiv","eu","ua",1,"Odesa"],["United Arab Emirates","Abu Dhabi","as","ae",2,""],["United Kingdom","London","eu","gb",1,"Manchester"],["United States","Washington, D.C.","am","us",1,"New York"],["Uruguay","Montevideo","am","uy",2,""],["Uzbekistan","Tashkent","as","uz",3,"Samarkand"],["Vanuatu","Port Vila","oc","vu",3,""],["Vatican City","","eu","va",3,""],["Venezuela","Caracas","am","ve",2,""],["Vietnam","Hanoi","as","vn",1,"Ho Chi Minh City"],["Yemen","Sana'a","as","ye",3,""],["Zambia","Lusaka","af","zm",3,""],["Zimbabwe","Harare","af","zw",2,""]];
+const REGIONS=[{id:'eu',name:'Europe'},{id:'as',name:'Asia'},{id:'af',name:'Africa'},{id:'am',name:'Americas'},{id:'oc',name:'Oceania'}];
+const REGION_IDS=REGIONS.map(r=>r.id);
+let REG=null; // continents for the stream that is running (null = all)
+const FLAG_BASE=(()=>{try{const s=document.currentScript&&document.currentScript.src;return s?new URL('flags/',s).href:'flags/'}catch(e){return'flags/'}})();
+/* flags that look identical are never offered against each other */
+const LOOKALIKE={ro:'td',td:'ro',id:'mc',mc:'id'};
+const C_NAME=0,C_CAP=1,C_REG=2,C_ISO=3,C_TIER=4,C_TRAP=5;
+function geoPool(needCap){const regs=REG&&REG.length?REG:REGION_IDS,all=COUNTRIES.filter(c=>regs.includes(c[C_REG])&&(!needCap||c[C_CAP]));
+  const tier=all.filter(c=>c[C_TIER]===LV());return{all,pick:tier.length?tier:all}}
+/* wrong options: same continent first (more plausible), then anywhere */
+function geoWrong(c,field,needCap,trap){const near=COUNTRIES.filter(x=>x!==c&&x[C_REG]===c[C_REG]&&(!needCap||x[C_CAP])&&LOOKALIKE[c[C_ISO]]!==x[C_ISO]).map(x=>x[field]);
+  const far=COUNTRIES.filter(x=>x!==c&&(!needCap||x[C_CAP])&&LOOKALIKE[c[C_ISO]]!==x[C_ISO]).map(x=>x[field]);
+  const w=pickN(near.length>=2?near:far,2,c[field],trap&&trap!==c[field]?trap:null);while(w.length<2)w.push(pickN(far,1,c[field])[0]);return w}
+const rand=a=>a[Math.floor(Math.random()*a.length)];
+const THE=new Set(['United States','United Kingdom','Netherlands','Philippines','Bahamas','Gambia','Maldives','United Arab Emirates','Central African Republic',
+  'Dominican Republic','Marshall Islands','Solomon Islands','Comoros','Seychelles','DR Congo','Republic of the Congo','Czech Republic']);
+const theName=n=>THE.has(n)?'the '+n:n;
+function capitals(){const {pick}=geoPool(true),c=rand(pick);
+  if(Math.random()<.5)return{q:`Capital of ${theName(c[C_NAME])}`,c:c[C_CAP],w:geoWrong(c,C_CAP,true,LV()>1?c[C_TRAP]:'')};
+  return{q:`${c[C_CAP]} is the capital of…`,c:c[C_NAME],w:geoWrong(c,C_NAME,true)}}
+function flags(){const {pick}=geoPool(false),c=rand(pick);
+  return{q:'Which country is this?',c:c[C_NAME],w:geoWrong(c,C_NAME,false),img:FLAG_BASE+c[C_ISO]+'.webp',tag:'flag'}}
 
 /* ---- Science ---- */
 const PLANETS=['Mercury','Venus','Earth','Mars','Jupiter','Saturn','Uranus','Neptune'];
@@ -386,9 +311,8 @@ const SUBJECTS=[
   {id:'squares',name:'Squares and roots',bl:'12², √81',d:3,gen:squares},
   {id:'order',name:'Order of operations',bl:'multiply before you add',d:3,gen:order}]},
  {id:'geo',name:'Geography',g:'◎',blurb:'Countries, capitals and flags',topics:[
-  {id:'eurocaps',name:'European capitals',bl:'from Lisbon to Kyiv',d:1,gen:euroCaps},
-  {id:'flags',name:'Guess the flag',bl:'stripes, crosses and circles',d:2,gen:flags},
-  {id:'worldcaps',name:'World capitals',bl:'trickier than you think',d:3,gen:worldCaps}]},
+  {id:'capitals',name:'Capitals',bl:'pick the continents',d:1,regions:true,gen:capitals},
+  {id:'flags',name:'Guess the flag',bl:'pick the continents',d:1,regions:true,gen:flags}]},
  {id:'science',name:'Science',g:'H₂O',blurb:'Space, chemistry and the body',topics:[
   {id:'planets',name:'Planets',bl:'our solar system',d:1,gen:planets},
   {id:'body',name:'Human body',bl:'organs, bones and blood',d:2,gen:body},
@@ -423,18 +347,52 @@ function qKey(Q){const q=String(Q.q).replace(/\s*=\s*\?\s*$/,'').trim();
 /* No repeats for the whole run. When the chosen level runs dry, the topic's other levels are used
    (nearest first, harder before easier). Only when every level is used up does a repeat come back
    (never one of the last 12); it is flagged Q.repeat and next.exhausted turns true, so a game can end the run instead. */
-function stream(topic,level){const used=new Set(),recent=[],dry=new Set();
+/* ---- continents: remembered per topic on this device (all EduGames games share it) ---- */
+const REG_KEY='edu-regions';
+function getRegions(tid){try{const v=(JSON.parse(localStorage.getItem(REG_KEY)||'{}')||{})[tid];if(Array.isArray(v)){const ok=v.filter(x=>REGION_IDS.includes(x));if(ok.length)return ok}}catch(e){}return REGION_IDS.slice()}
+function setRegions(tid,list){const ok=(list||[]).filter(x=>REGION_IDS.includes(x));try{const all=JSON.parse(localStorage.getItem(REG_KEY)||'{}')||{};all[tid]=ok.length?ok:REGION_IDS.slice();localStorage.setItem(REG_KEY,JSON.stringify(all))}catch(e){}}
+const parseRegions=v=>{const ok=String(v||'').split(',').map(x=>x.trim()).filter(x=>REGION_IDS.includes(x));return ok.length?ok:null};
+function regionLabel(list){const l=list&&list.length?list:REGION_IDS;return l.length===REGION_IDS.length?'All continents':l.map(id=>REGIONS.find(r=>r.id===id).name).join(', ')}
+/* a row of continent chips for a game's own menu. Colours follow the menu (currentColor);
+   a game can set --eq-on-bg / --eq-on-fg on a parent to match its theme. */
+let pickerCss=false;
+function regionPicker(topic,opts){opts=opts||{};if(!topic||!topic.regions)return null;
+  if(!pickerCss){pickerCss=true;const st=document.createElement('style');st.textContent=`
+.eq-reg{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0 2px}
+.eq-reg button{font:inherit;font-size:14px;font-weight:700;line-height:1;border-radius:999px;padding:9px 13px;cursor:pointer;
+  color:var(--eq-fg);background:var(--eq-bg);border:1.5px solid var(--eq-line)}
+.eq-reg button[aria-pressed=true]{background:var(--eq-on-bg);border-color:var(--eq-on-bg);color:var(--eq-on-fg)}
+.eq-reg button:focus-visible{outline:2px solid var(--eq-on-bg);outline-offset:2px}`;document.head.append(st)}
+  const box=document.createElement('div');box.className='eq-reg';box.setAttribute('role','group');box.setAttribute('aria-label','Continents');
+  const paint=()=>{const cur=getRegions(topic.id),all=cur.length===REGION_IDS.length;box.innerHTML='';
+    const mk=(id,name,on)=>{const b=document.createElement('button');b.type='button';b.textContent=name;b.setAttribute('aria-pressed',on);
+      b.onclick=e=>{e.stopPropagation();let next;if(id==='all')next=REGION_IDS.slice();else if(all)next=[id];
+        else{next=cur.includes(id)?cur.filter(x=>x!==id):cur.concat(id);if(!next.length)next=REGION_IDS.slice()}
+        setRegions(topic.id,next);paint();opts.onChange&&opts.onChange(getRegions(topic.id))};return b};
+    box.append(mk('all','All',all));REGIONS.forEach(r=>box.append(mk(r.id,r.name,!all&&cur.includes(r.id))))};
+  /* colours from the menu's own text colour, so chips read on light cards and dark scenes alike;
+     a game can still set --eq-bg, --eq-fg, --eq-line, --eq-on-bg, --eq-on-fg itself */
+  const tone=()=>{if(!box.isConnected)return requestAnimationFrame(tone);const cs=getComputedStyle(box),m=(cs.color.match(/[\d.]+/g)||[0,0,0]).map(Number);
+    const light=(.2126*m[0]+.7152*m[1]+.0722*m[2])/255>.6,set=(k,v)=>{if(!cs.getPropertyValue(k).trim())box.style.setProperty(k,v)};
+    if(light){set('--eq-fg','#fff');set('--eq-bg','rgba(14,16,26,.72)');set('--eq-line','rgba(255,255,255,.28)');set('--eq-on-bg','#fff');set('--eq-on-fg','#14161f')}
+    else{set('--eq-fg','#1d2033');set('--eq-bg','#fff');set('--eq-line','rgba(20,22,40,.16)');set('--eq-on-bg','#1d2033');set('--eq-on-fg','#fff')}};
+  paint();tone();return box}
+function stream(topic,level,opts){opts=opts||{};const used=new Set(),recent=[],dry=new Set();
+  const regs=topic&&topic.regions?(opts.regions?parseRegions(opts.regions.join?opts.regions.join(','):opts.regions):getRegions(topic.id)):null;
   const order=[level,...[1,2,3].filter(l=>l!==level).sort((a,b)=>Math.abs(a-level)-Math.abs(b-level)||b-a)];
   function next(){let Q,k,repeat=false,found=false;
+    REG=regs;
     for(const l of order){if(dry.has(l))continue;LEVEL=l;
       for(let g=0;g<150;g++){Q=topic.gen();k=qKey(Q);if(!used.has(k)){found=true;break}}
       if(found)break;dry.add(l)}
     LEVEL=level;
     if(!found){repeat=true;next.exhausted=true;for(let g=0;g<60;g++){Q=topic.gen();k=qKey(Q);if(!recent.includes(k))break}}
+    REG=null;
     used.add(k);recent.push(k);if(recent.length>12)recent.shift();
   const c=String(Q.c),seen=new Set([c]);const raw=Q.w.slice(0,2);while(raw.length<2)raw.push(c);
   const w=raw.map(v=>{let x=String(v);while(seen.has(x))x=isNaN(+x)?x+'s':String(+x+1);seen.add(x);return x});
   const ans=shuffle([c,...w]);return{q:Q.q,img:Q.img||null,code:Q.code||null,ans,correct:ans.indexOf(c),answer:c,repeat}}
-  next.exhausted=false;return next}
-window.EduQ={SUBJECTS,SICON,SHUE,DIFFNAME,findTopic,stream,setLevel:l=>{LEVEL=l},shuffle,ri:ri_};
+  next.exhausted=false;next.regions=regs;return next}
+window.EduQ={SUBJECTS,SICON,SHUE,DIFFNAME,findTopic,stream,setLevel:l=>{LEVEL=l},shuffle,ri:ri_,
+  REGIONS,getRegions,setRegions,parseRegions,regionLabel,regionPicker,COUNTRY_COUNT:COUNTRIES.length};
 })();

@@ -376,9 +376,10 @@ function renderSubjects(){const box=$('subjects');box.innerHTML='';
 function renderTopics(){const s=curSubject(),t=curTopic();cfg.topic=t.id;$('subName').textContent=s.name;
   const box=$('topics');box.innerHTML='';box.style.setProperty('--h',SHUE[s.id]);
   s.topics.forEach(tp=>{const b=el('button','row');b.type='button';b.setAttribute('aria-pressed',tp.id===cfg.topic);
-    const tx=el('span','tx');tx.append(el('strong',null,tp.name),el('span',null,tp.bl));
+    const tx=el('span','tx');tx.append(el('strong',null,tp.name),el('span',null,tp.regions&&EduQ.regionLabel?EduQ.regionLabel(EduQ.getRegions(tp.id)):tp.bl));
     const side=el('span');const bs=getBest(tp.id,topicDiff(tp));if(bs)side.append(el('span','best',`best ${bs}`));
     b.append(el('span','radio'),tx,side);b.onclick=()=>{cfg.topic=tp.id;saveCfg();renderTopics()};box.append(b)});
+  {const old=document.getElementById('regPick');if(old)old.remove();const pk=EduQ.regionPicker&&EduQ.regionPicker(t,{onChange:renderTopics});if(pk){pk.id='regPick';box.after(pk)}}
   $('startBtn').textContent='Start';$('clockHint').textContent=clockHint(CLK());
   document.querySelectorAll('#diffSeg button').forEach(b=>b.setAttribute('aria-pressed',+b.dataset.d===DIFF()));
   document.querySelectorAll('#clockSeg button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.c===cfg.clock))}
@@ -594,7 +595,7 @@ function clockDelta(txt,cls){const l=$('clockL');l.textContent=txt;l.className=c
 
 function reset(){clearTower();right=0;asked=0;streak=0;bestStreak=0;peak=0;missed=[];beat=false;timeLeft=CLK().start;played=0;lastSec=Math.ceil(timeLeft);
   best=getBest();recordG.visible=false;paintHud();paintClock()}
-function start(){reset();setRecord(best,false);next=stream(curTopic(),DIFF());panel(null);show('hud',true);show('qbox',false);show('answers',false);
+function start(){reset();setRecord(best,false);next=stream(curTopic(),DIFF(),EMBED_REG?{regions:EMBED_REG}:undefined);panel(null);show('hud',true);show('qbox',false);show('answers',false);
   state='count';countT=3.2;show('count',true);tickCount(3);paintAudio()}
 function tickCount(n){const c=$('countN');c.textContent=n||'Go';c.classList.remove('tick');void c.offsetWidth;c.classList.add('tick');S.tick(n)}
 function ask(){cur=next();lock=false;$('answers').classList.remove('lock');const qb=$('qbox');qb.classList.remove('right','wrong');
@@ -654,6 +655,8 @@ addEventListener('keydown',e=>{if(e.repeat)return;
    lock=1 (class mode): no replay, no topic menu. Posts edu-ready on load, edu-progress after every answer, edu-result at the end. */
 const EMBED=(()=>{const p=new URLSearchParams(location.search);if(!p.get('topic'))return null;
   return{topic:p.get('topic'),level:+p.get('level')||0,clock:p.get('clock'),lock:p.get('lock')==='1'}})();
+/* continents from the portal (class mode); no regions param = all continents */
+const EMBED_REG=EMBED?(EduQ.parseRegions?EduQ.parseRegions(new URLSearchParams(location.search).get('regions'))||EduQ.REGIONS.map(r=>r.id):null):null;
 const toParent=m=>{try{if(window.parent!==window)window.parent.postMessage(m,'*')}catch(e){}};
 function applyEmbed(){if(!EMBED)return false;const s=SUBJECTS.find(s=>s.topics.some(t=>t.id===EMBED.topic));if(!s)return false;
   cfg.subject=s.id;cfg.topic=EMBED.topic;if([1,2,3].includes(EMBED.level))cfg.diffs[EMBED.topic]=EMBED.level;if(CLOCKS[EMBED.clock])cfg.clock=EMBED.clock;

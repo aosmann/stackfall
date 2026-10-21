@@ -22,3 +22,8 @@ Same family as [Lanefall](https://github.com/aosmann/lanefall): the same minimal
 ## Results for the portal
 Every finished run is appended to `localStorage['edu-results']` (last 200) and, when the game runs inside another page, posted to it:
 `window.parent.postMessage({type:'edu-result', result})`, where `result` holds game, subject, topic, level, duration, score, peak, right, asked, bestStreak, missed[] and a timestamp.
+
+## Credits
+
+Country, capital and continent data: [mledoze/countries](https://github.com/mledoze/countries), Open Database License (ODbL 1.0).  
+Flags: [flag-icons](https://github.com/lipis/flag-icons), MIT licence, compressed into `flags/`.
