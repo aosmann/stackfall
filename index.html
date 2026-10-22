@@ -370,12 +370,13 @@ function logResult(r){
 /* ======================= MENUS ======================= */
 function renderSubjects(){const box=$('subjects');box.innerHTML='';
   SUBJECTS.forEach(s=>{const b=el('button','tile push');b.type='button';b.style.setProperty('--h',SHUE[s.id]);
-    const tx=el('span','tx');tx.append(el('strong',null,s.name),el('span',null,`${s.topics.length} topics`));
+    const tx=el('span','tx');tx.append(el('strong',null,s.name),el('span',null,`${s.topics.filter(x=>!x.unit).length} topics`));
     const ic=el('span','sicon');ic.innerHTML=`<svg viewBox="0 0 24 24" aria-hidden="true">${SICON[s.id]}</svg>`;
     b.append(ic,tx);b.onclick=()=>{if(cfg.subject!==s.id){cfg.subject=s.id;cfg.topic=s.topics[0].id}saveCfg();paintPalette();go('stepTopic')};box.append(b)})}
 function renderTopics(){const s=curSubject(),t=curTopic();cfg.topic=t.id;$('subName').textContent=s.name;
   const box=$('topics');box.innerHTML='';box.style.setProperty('--h',SHUE[s.id]);
-  s.topics.forEach(tp=>{const b=el('button','row');b.type='button';b.setAttribute('aria-pressed',tp.id===cfg.topic);
+  {const o=document.getElementById('topTabs');if(o)o.remove();const tb=EduQ.topicTabs&&EduQ.topicTabs(s,t,id=>{cfg.topic=id;saveCfg();renderTopics()});if(tb){tb.id='topTabs';box.before(tb)}}
+  (EduQ.topicsOf?EduQ.topicsOf(s,t):s.topics).forEach(tp=>{const b=el('button','row');b.type='button';b.setAttribute('aria-pressed',tp.id===cfg.topic);
     const tx=el('span','tx');tx.append(el('strong',null,tp.name),el('span',null,tp.regions&&EduQ.regionLabel?EduQ.regionLabel(EduQ.getRegions(tp.id)):tp.bl));
     const side=el('span');const bs=getBest(tp.id,topicDiff(tp));if(bs)side.append(el('span','best',`best ${bs}`));
     b.append(el('span','radio'),tx,side);b.onclick=()=>{cfg.topic=tp.id;saveCfg();renderTopics()};box.append(b)});
@@ -607,10 +608,10 @@ function answer(i){
   if(state!=='run'||lock||!cur)return;lock=true;$('answers').classList.add('lock');asked++;
   const ok=i===cur.correct,qb=$('qbox'),ck=CLK(),bonus=Math.max(.5,ck.plus-.5*Math.floor(right/8));
   ansEls.forEach((b,k)=>{b.classList.add(k===cur.correct?'ok':k===i?'no':'dim')});
-  if(ok){timeLeft=Math.min(ck.start+5,timeLeft+bonus);clockDelta(`+${bonus} s`,'good');right++;streak++;bestStreak=Math.max(bestStreak,streak);qb.classList.add('right');addBlock(false);S.correct();
+  if(ok){timeLeft=Math.min(ck.start+5,timeLeft+bonus);clockDelta(`+${bonus} s`,'good');right++;lastAns={q:cur.img?'This flag':cur.q,img:cur.img||null,answer:cur.answer,picked:cur.answer,ok:1,tag:cur.tag||null};streak++;bestStreak=Math.max(bestStreak,streak);qb.classList.add('right');addBlock(false);S.correct();
     const gold=streak%5===0;if(gold)setTimeout(()=>{if(state==='run'||state==='over')addBlock(true)},200);
     const c=CHEER[streak]||(gold?['Gold floor',`${streak} in a row`]:null);if(c)banner(c[0],c[1],gold?'var(--sun-d)':'var(--coral-d)')}
-  else{timeLeft=Math.max(0,timeLeft-ck.minus);clockDelta(`−${ck.minus} s`,'bad');streak=0;qb.classList.add('wrong');missed.push({q:cur.img?'This flag':cur.q,img:cur.img,answer:cur.answer,picked:cur.ans[i]});
+  else{timeLeft=Math.max(0,timeLeft-ck.minus);clockDelta(`−${ck.minus} s`,'bad');streak=0;qb.classList.add('wrong');missed.push({q:cur.img?'This flag':cur.q,img:cur.img,answer:cur.answer,picked:cur.ans[i]});lastAns=Object.assign({},missed[missed.length-1],{ok:0,tag:cur.tag||null});
     const k=knock(3);S.wrong();setTimeout(()=>S.crumble(),60);freeze=.12;shake=.28;flash('#ff4d5e');popAt(settledTop()+FH*2,k?`−${k}`:'Miss','bad')}
   peak=Math.max(peak,tower.length);
   if(!beat&&best>0&&tower.length>best){beat=true;setRecord(best,true);S.record();setTimeout(()=>{banner('New record',`past your ${best}`,'var(--good-d)');burst('conf',new THREE.Vector3(0,BASE_Y+settledTop()+1,0),46)},350)}
@@ -657,7 +658,8 @@ const EMBED=(()=>{const p=new URLSearchParams(location.search);if(!p.get('topic'
   return{topic:p.get('topic'),level:+p.get('level')||0,clock:p.get('clock'),lock:p.get('lock')==='1'}})();
 /* continents from the portal (class mode); no regions param = all continents */
 const EMBED_REG=EMBED?(EduQ.parseRegions?EduQ.parseRegions(new URLSearchParams(location.search).get('regions'))||EduQ.REGIONS.map(r=>r.id):null):null;
-const toParent=m=>{try{if(window.parent!==window)window.parent.postMessage(m,'*')}catch(e){}};
+let lastAns=null;/* the last answer rides on the next edu-progress, for the portal's mistakes report */
+const toParent=m=>{try{if(m&&m.type==='edu-progress'&&lastAns){m.last=lastAns;lastAns=null}if(window.parent!==window)window.parent.postMessage(m,'*')}catch(e){}};
 function applyEmbed(){if(!EMBED)return false;const s=SUBJECTS.find(s=>s.topics.some(t=>t.id===EMBED.topic));if(!s)return false;
   cfg.subject=s.id;cfg.topic=EMBED.topic;if([1,2,3].includes(EMBED.level))cfg.diffs[EMBED.topic]=EMBED.level;if(CLOCKS[EMBED.clock])cfg.clock=EMBED.clock;
   if(EMBED.lock){$('againBtn').hidden=true;$('menuBtn').hidden=true;const n=document.createElement('p');n.textContent='Result sent to your teacher.';
