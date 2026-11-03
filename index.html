@@ -210,6 +210,7 @@ h1,h2{margin:0;font-weight:500;font-family:var(--display);text-wrap:balance}
 .foot{font:400 12px/1.4 var(--mono);color:var(--dim);text-align:center;margin:0}
 .hint{font:400 12px/1.45 var(--mono);color:var(--soft);margin:0;text-align:center}
 @media (prefers-reduced-motion:reduce){#countN.tick,#clock.low #clockN{animation:none}*{transition-duration:.01s!important}}
+#clockSeg{grid-template-columns:repeat(4,minmax(0,1fr))}
 </style>
 </head>
 <body>
@@ -290,6 +291,7 @@ h1,h2{margin:0;font-weight:500;font-family:var(--display);text-wrap:balance}
           <button type="button" data-c="quick">Quick</button>
           <button type="button" data-c="normal">Normal</button>
           <button type="button" data-c="relaxed">Relaxed</button>
+          <button type="button" data-c="custom">Custom</button>
         </div>
         <p class="hint" id="clockHint"></p>
         <button type="button" class="cta push" id="startBtn">Start</button>
@@ -340,7 +342,7 @@ const fmtT=s=>{s=Math.max(0,Math.ceil(s));return s>=60?`${Math.floor(s/60)}:${St
 /* Chess-clock style: start with a few seconds, right answers add time, wrong ones take it away.
    The clock only runs while a question is up. Bonus time shrinks by 0.5 s every 8 right answers (never below 0.5 s),
    and the clock can't go above start + 5 s, so every run ends sooner or later. */
-const CLOCKS={quick:{name:'Quick',start:10,plus:2,minus:2},normal:{name:'Normal',start:15,plus:2,minus:2},relaxed:{name:'Relaxed',start:20,plus:3,minus:2}};
+const CLOCKS={quick:{name:'Quick',start:10,plus:2,minus:2},normal:{name:'Normal',start:15,plus:2,minus:2},relaxed:{name:'Relaxed',start:30,plus:1,minus:1}};
 const fmtClock=s=>s<=0?'0':s<5?s.toFixed(1):String(Math.ceil(s));
 const clockHint=c=>`Start with ${c.start} s. Right answers add ${c.plus} s, wrong ones take ${c.minus} s.`;
 const fmtLong=s=>s>=60?`${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`:`${s} sec`;
@@ -351,14 +353,21 @@ const SHUE={english:'#ff7a5c',math:'#f2c46d',geo:'#5fd39a',science:'#6cb8ff',inf
 /* ======================= SETTINGS ======================= */
 const cfg={subject:'english',topic:'irregular',diffs:{},clock:'normal'};
 try{const s=JSON.parse(localStorage.getItem('stackfall-cfg')||'{}');Object.assign(cfg,s);if(!cfg.diffs)cfg.diffs={}}catch(e){}
-if(!CLOCKS[cfg.clock])cfg.clock='normal';delete cfg.time;
-const CLK=()=>CLOCKS[cfg.clock]||CLOCKS.normal;
+if(!CLOCKS[cfg.clock]&&cfg.clock!=='custom')cfg.clock='normal';delete cfg.time;
+/* custom clock: start seconds, + per right answer, − per wrong one (teacher or player picks) */
+const CUSTOM_FIELDS=[{key:'start',label:'Start',unit:'s',min:5,max:300,step:5},{key:'plus',label:'Right',prefix:'+',unit:'s',min:0,max:10},{key:'minus',label:'Wrong',prefix:'−',unit:'s',min:0,max:10}];
+const clampC=c=>{c=c||{};const f=(k,dv,lo,hi)=>{const v=+c[k];return Number.isFinite(v)&&c[k]!==''&&c[k]!=null?Math.min(hi,Math.max(lo,Math.round(v))):dv};return{start:f('start',30,5,300),plus:f('plus',2,0,10),minus:f('minus',1,0,10)}};
+cfg.custom=clampC(cfg.custom);
+const CLK=()=>cfg.clock==='custom'?Object.assign({name:'Custom'},clampC(cfg.custom)):(CLOCKS[cfg.clock]||CLOCKS.normal);
+const clockId=()=>{if(cfg.clock!=='custom')return cfg.clock;const c=clampC(cfg.custom);return `custom${c.start}-${c.plus}-${c.minus}`};
+function paintCustom(){const o=document.getElementById('customClock');if(o)o.remove();if(cfg.clock!=='custom'||!EduQ.customRow)return;
+  const row=EduQ.customRow(CUSTOM_FIELDS,clampC(cfg.custom),v=>{cfg.custom=clampC(v);saveCfg();renderTopics()});row.id='customClock';$('clockSeg').after(row)}
 const saveCfg=()=>{try{localStorage.setItem('stackfall-cfg',JSON.stringify(cfg))}catch(e){}};
 const curSubject=()=>SUBJECTS.find(s=>s.id===cfg.subject)||SUBJECTS[0];
 const curTopic=()=>{const s=curSubject();return s.topics.find(t=>t.id===cfg.topic)||s.topics[0]};
 const topicDiff=tp=>cfg.diffs[tp.id]||tp.d;
 const DIFF=()=>topicDiff(curTopic());
-const bestKey=(id,d,t)=>`stackfall-best-${id||curTopic().id}-d${d||DIFF()}-c${t||cfg.clock}`;
+const bestKey=(id,d,t)=>`stackfall-best-${id||curTopic().id}-d${d||DIFF()}-c${t||clockId()}`;
 const getBest=(id,d,t)=>{try{return +localStorage.getItem(bestKey(id,d,t))||0}catch(e){return 0}};
 
 /* Results log for the future portal: kept locally, and posted to a parent page if Stackfall runs inside one */
@@ -383,7 +392,7 @@ function renderTopics(){const s=curSubject(),t=curTopic();cfg.topic=t.id;$('subN
   {const old=document.getElementById('regPick');if(old)old.remove();const pk=EduQ.regionPicker&&EduQ.regionPicker(t,{onChange:renderTopics});if(pk){pk.id='regPick';box.after(pk)}}
   $('startBtn').textContent='Start';$('clockHint').textContent=clockHint(CLK());
   document.querySelectorAll('#diffSeg button').forEach(b=>b.setAttribute('aria-pressed',+b.dataset.d===DIFF()));
-  document.querySelectorAll('#clockSeg button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.c===cfg.clock))}
+  document.querySelectorAll('#clockSeg button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.c===cfg.clock));paintCustom();}
 document.querySelectorAll('#diffSeg button').forEach(b=>b.onclick=()=>{cfg.diffs[curTopic().id]=+b.dataset.d;saveCfg();renderTopics()});
 document.querySelectorAll('#clockSeg button').forEach(b=>b.onclick=()=>{cfg.clock=b.dataset.c;saveCfg();renderTopics()});
 const SCREENS=['scrHome','stepSubj','stepTopic'];
@@ -612,7 +621,7 @@ function answer(i){
     const gold=streak%5===0;if(gold)setTimeout(()=>{if(state==='run'||state==='over')addBlock(true)},200);
     const c=CHEER[streak]||(gold?['Gold floor',`${streak} in a row`]:null);if(c)banner(c[0],c[1],gold?'var(--sun-d)':'var(--coral-d)')}
   else{timeLeft=Math.max(0,timeLeft-ck.minus);clockDelta(`−${ck.minus} s`,'bad');streak=0;qb.classList.add('wrong');missed.push({q:cur.img?'This flag':cur.q,img:cur.img,answer:cur.answer,picked:cur.ans[i]});lastAns=Object.assign({},missed[missed.length-1],{ok:0,tag:cur.tag||null});
-    const k=knock(3);S.wrong();setTimeout(()=>S.crumble(),60);freeze=.12;shake=.28;flash('#ff4d5e');popAt(settledTop()+FH*2,k?`−${k}`:'Miss','bad')}
+    const k=knock(1);S.wrong();setTimeout(()=>S.crumble(),60);freeze=.12;shake=.28;flash('#ff4d5e');popAt(settledTop()+FH*2,k?`−${k}`:'Miss','bad')}
   peak=Math.max(peak,tower.length);
   if(!beat&&best>0&&tower.length>best){beat=true;setRecord(best,true);S.record();setTimeout(()=>{banner('New record',`past your ${best}`,'var(--good-d)');burst('conf',new THREE.Vector3(0,BASE_Y+settledTop()+1,0),46)},350)}
   paintHud();toParent({type:'edu-progress',game:'stackfall',score:tower.length,right,asked});
@@ -627,7 +636,7 @@ function finish(cause){
   if(state!=='run'&&state!=='paused')return;state='over';show('qbox',false);show('answers',false);show('count',false);S.end();
   if(hang)hang.visible=false;rope.visible=false;
   const sc=tower.length,isBest=sc>best&&sc>0;if(isBest){best=sc;try{localStorage.setItem(bestKey(),best)}catch(e){}}
-  logResult({game:'stackfall',subject:curSubject().id,topic:curTopic().id,topicName:curTopic().name,level:DIFF(),clock:cfg.clock,duration:Math.round(played),
+  logResult({game:'stackfall',subject:curSubject().id,topic:curTopic().id,topicName:curTopic().name,level:DIFF(),clock:clockId(),duration:Math.round(played),
     timeUsed:Math.round(played),score:sc,peak,right,asked,bestStreak,missed:missed.map(m=>({q:m.q,answer:m.answer,picked:m.picked})),at:new Date().toISOString()});
   if(isBest)setTimeout(()=>burst('conf',new THREE.Vector3(0,BASE_Y+settledTop()+1,0),60),400);
   setTimeout(()=>{
@@ -655,13 +664,13 @@ addEventListener('keydown',e=>{if(e.repeat)return;
    Opened by the portal as ?topic=<id>&level=1-3&time=60|90|120&lock=1 → settings come from the portal and the run starts at once.
    lock=1 (class mode): no replay, no topic menu. Posts edu-ready on load, edu-progress after every answer, edu-result at the end. */
 const EMBED=(()=>{const p=new URLSearchParams(location.search);if(!p.get('topic'))return null;
-  return{topic:p.get('topic'),level:+p.get('level')||0,clock:p.get('clock'),lock:p.get('lock')==='1'}})();
+  return{topic:p.get('topic'),level:+p.get('level')||0,clock:p.get('clock'),cc:{start:p.get('clock_start'),plus:p.get('clock_plus'),minus:p.get('clock_minus')},lock:p.get('lock')==='1'}})();
 /* continents from the portal (class mode); no regions param = all continents */
 const EMBED_REG=EMBED?(EduQ.parseRegions?EduQ.parseRegions(new URLSearchParams(location.search).get('regions'))||EduQ.REGIONS.map(r=>r.id):null):null;
 let lastAns=null;/* the last answer rides on the next edu-progress, for the portal's mistakes report */
 const toParent=m=>{try{if(m&&m.type==='edu-progress'&&lastAns){m.last=lastAns;lastAns=null}if(window.parent!==window)window.parent.postMessage(m,'*')}catch(e){}};
 function applyEmbed(){if(!EMBED)return false;const s=SUBJECTS.find(s=>s.topics.some(t=>t.id===EMBED.topic));if(!s)return false;
-  cfg.subject=s.id;cfg.topic=EMBED.topic;if([1,2,3].includes(EMBED.level))cfg.diffs[EMBED.topic]=EMBED.level;if(CLOCKS[EMBED.clock])cfg.clock=EMBED.clock;
+  cfg.subject=s.id;cfg.topic=EMBED.topic;if([1,2,3].includes(EMBED.level))cfg.diffs[EMBED.topic]=EMBED.level;if(CLOCKS[EMBED.clock])cfg.clock=EMBED.clock;else if(EMBED.clock==='custom'){cfg.clock='custom';cfg.custom=clampC(EMBED.cc)}
   if(EMBED.lock){$('againBtn').hidden=true;$('menuBtn').hidden=true;const n=document.createElement('p');n.textContent='Result sent to your teacher.';
     n.style.cssText='margin:0;text-align:center;color:var(--soft);font:400 13px/1.4 var(--mono)';$('againBtn').parentNode.prepend(n)}
   return true}

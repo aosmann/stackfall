@@ -3,7 +3,7 @@
 Educational tower stacker. Pick a subject, topic, difficulty and clock, then build the tallest tower you can before the clock hits zero.
 
 - Right answer: a floor drops onto the tower (+1)
-- Wrong answer: the top 3 floors are knocked off
+- Wrong answer: the top floor is knocked off
 - Every 5 right answers in a row: a bonus gold floor (+2 in total)
 - Clock (chess-clock style): you start with a few seconds; a right answer adds time, a wrong one takes it away. The clock only runs while a question is up.
   - Quick: start 10 s, +2 s / −2 s · Normal: start 15 s, +2 s / −2 s · Relaxed: start 20 s, +3 s / −2 s

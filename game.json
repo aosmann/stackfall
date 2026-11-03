@@ -42,10 +42,44 @@
         ],
         [
           "relaxed",
-          "Relaxed · 20 s"
+          "Relaxed · 30 s"
         ]
       ],
-      "default": "normal"
+      "default": "normal",
+      "custom": {
+        "label": "Custom",
+        "fields": [
+          {
+            "key": "start",
+            "label": "Start",
+            "unit": "s",
+            "min": 5,
+            "max": 300,
+            "step": 5,
+            "default": 30
+          },
+          {
+            "key": "plus",
+            "label": "Right answer",
+            "prefix": "+",
+            "unit": "s",
+            "min": 0,
+            "max": 10,
+            "step": 1,
+            "default": 2
+          },
+          {
+            "key": "minus",
+            "label": "Wrong answer",
+            "prefix": "−",
+            "unit": "s",
+            "min": 0,
+            "max": 10,
+            "step": 1,
+            "default": 1
+          }
+        ]
+      }
     }
   ]
 }
